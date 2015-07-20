@@ -7,7 +7,7 @@ package com.markaldrich.sigma.framework.elements;
  */
 public class SigmaAssignment extends SigmaElement implements SigmaStatement {
 	public SigmaObject object;
-	public SigmaObject dataToAssign;
+	public String dataToAssign;
 	
 	@Override
 	public String toString() {

@@ -11,8 +11,8 @@ public class SigmaClass extends SigmaElement {
 	
 	public String name;
 	public SigmaAccessModifier access;
-	public ArrayList<SigmaGlobalVariable> globalVariables;
-	public ArrayList<SigmaMethod> methods;
+	public ArrayList<SigmaGlobalVariable> globalVariables = new ArrayList<>();
+	public ArrayList<SigmaMethod> methods = new ArrayList<>();
 	
 	@Override
 	public String toString() {
@@ -21,7 +21,7 @@ public class SigmaClass extends SigmaElement {
 		toReturn += "class " + name + " {";
 		
 		for(SigmaGlobalVariable g : globalVariables) {
-			toReturn += g.toString();
+			toReturn += g.declarationToString();
 		}
 		
 		for(SigmaMethod m : methods) {

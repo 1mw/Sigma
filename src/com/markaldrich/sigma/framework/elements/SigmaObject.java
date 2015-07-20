@@ -8,11 +8,11 @@ package com.markaldrich.sigma.framework.elements;
 public class SigmaObject extends SigmaElement {
 	public String name;
 	public String type;
-	public String dataName;
+	public String data;
 	public int declarationLine;
 	
 	public String declarationToString() {
-		return name + " = " + dataName + ";";
+		return type + " " + name + " = " + data + ";";
 	}
 	
 	@Override
