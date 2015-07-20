@@ -13,6 +13,7 @@ public class SigmaMethodCall extends SigmaElement implements SigmaStatement {
 	
 	@Override
 	public String toString() {
+		if(method == null) System.err.println("Method call has no method to call!");
 		String toReturn = "";
 		
 		toReturn += method + "(";
