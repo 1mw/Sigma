@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * @author maste
  *
  */
-public class SigmaMethod {
+public class SigmaMethod extends SigmaElement {
 	
 	public String name;
 	public SigmaAccessModifier access;

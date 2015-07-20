@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * @author maste
  *
  */
-public class SigmaMethodCall implements SigmaStatement {
+public class SigmaMethodCall extends SigmaElement implements SigmaStatement {
 	public SigmaMethod method;
 	public ArrayList<SigmaObject> parameters;
 	

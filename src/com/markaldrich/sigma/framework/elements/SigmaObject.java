@@ -5,7 +5,7 @@ package com.markaldrich.sigma.framework.elements;
  * @author maste
  *
  */
-public class SigmaObject {
+public class SigmaObject extends SigmaElement {
 	public String name;
 	public String type;
 	public String dataName;

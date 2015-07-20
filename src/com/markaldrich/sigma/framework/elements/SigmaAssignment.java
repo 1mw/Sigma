@@ -5,7 +5,7 @@ package com.markaldrich.sigma.framework.elements;
  * @author maste
  * 
  */
-public class SigmaAssignment implements SigmaStatement {
+public class SigmaAssignment extends SigmaElement implements SigmaStatement {
 	public SigmaObject object;
 	public SigmaObject dataToAssign;
 	
