@@ -16,6 +16,8 @@ public class SigmaClass extends SigmaElement {
 	
 	@Override
 	public String toString() {
+		if(name == null) System.err.println("Class has null name!");
+		if(access == null) System.err.println("Class has null access modifier!");
 		String toReturn = "";
 		toReturn += (access == SigmaAccessModifier.NONE) ? "" : (access.toString().toLowerCase() + " ");
 		toReturn += "class " + name + " {";

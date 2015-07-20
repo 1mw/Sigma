@@ -21,6 +21,10 @@ public class SigmaMethod extends SigmaElement {
 	
 	@Override
 	public String toString() {
+		if(name == null) System.err.println("Method has null name!");
+		if(access == null) System.err.println("Method has null access modifier!");
+		if(returnType == null) System.err.println("Method has no return type!");
+		
 		String toReturn = ((access == SigmaAccessModifier.NONE) ? "" : (access.toString().toLowerCase() + " ")) + ((isStatic == true) ? "static " : "")  + returnType + " " + name + "(";
 		
 		{
@@ -37,7 +41,11 @@ public class SigmaMethod extends SigmaElement {
 		toReturn += ") {";
 		
 		for(SigmaStatement s : statements) {
-			toReturn += s.toString();
+			if(s instanceof SigmaObject) {
+				toReturn += ((SigmaObject) s).declarationToString();
+			} else {
+				toReturn += s.toString();
+			}
 		}
 		
 		toReturn += "}";
