@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 public class SigmaMethodCall extends SigmaElement implements SigmaStatement {
 	public String method;
-	public ArrayList<SigmaObject> parameters = new ArrayList<>();
+	public ArrayList<String> parameters = new ArrayList<>();
 	
 	@Override
 	public String toString() {
@@ -18,8 +18,8 @@ public class SigmaMethodCall extends SigmaElement implements SigmaStatement {
 		
 		toReturn += method + "(";
 		
-		for(SigmaObject o : parameters) {
-			toReturn += o.name;
+		for(String o : parameters) {
+			toReturn += o;
 			if(parameters.indexOf(o) == parameters.size() - 1) {
 			} else {
 				toReturn += ",";
@@ -37,8 +37,8 @@ public class SigmaMethodCall extends SigmaElement implements SigmaStatement {
 		
 		toReturn += method + "(";
 		
-		for(SigmaObject o : parameters) {
-			toReturn += o.name;
+		for(String o : parameters) {
+			toReturn += o;
 			if(parameters.indexOf(o) == parameters.size() - 1) {
 			} else {
 				toReturn += ",";

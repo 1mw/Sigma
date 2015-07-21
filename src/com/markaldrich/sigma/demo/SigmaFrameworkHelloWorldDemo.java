@@ -40,7 +40,7 @@ public class SigmaFrameworkHelloWorldDemo {
 					// Call a method
 					SigmaMethodCall s1 = new SigmaMethodCall();
 					s1.method = "System.out.println";
-					s1.parameters.add(helloWorldString);
+					s1.parameters.add("helloWorldString");
 					mainMethod.statements.add(s1);
 				}
 				// Add mainMethod to the class

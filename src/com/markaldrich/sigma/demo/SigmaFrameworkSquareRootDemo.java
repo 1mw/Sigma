@@ -42,7 +42,7 @@ public class SigmaFrameworkSquareRootDemo {
 				{
 					SigmaMethodCall getSquaredNumber = new SigmaMethodCall();
 					getSquaredNumber.method = "square";
-					getSquaredNumber.parameters.add(numberToSquare);
+					getSquaredNumber.parameters.add("numberToSquare");
 					// Purposely not added to main method
 					
 					SigmaObject squaredNumber = new SigmaObject();
@@ -54,7 +54,7 @@ public class SigmaFrameworkSquareRootDemo {
 					
 					SigmaMethodCall printNumber = new SigmaMethodCall();
 					printNumber.method = "System.out.println";
-					printNumber.parameters.add(squaredNumber);
+					printNumber.parameters.add("squaredNumber");
 					mainMethod.statements.add(printNumber);
 				}
 				main.methods.add(mainMethod);
