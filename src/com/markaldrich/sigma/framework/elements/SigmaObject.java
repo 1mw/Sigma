@@ -5,7 +5,7 @@ package com.markaldrich.sigma.framework.elements;
  * @author maste
  *
  */
-public class SigmaObject extends SigmaElement implements SigmaStatement {
+public class SigmaObject implements SigmaStatement, SigmaElement {
 	public String name;
 	public String type;
 	public String data;
@@ -15,7 +15,7 @@ public class SigmaObject extends SigmaElement implements SigmaStatement {
 		if(name == null) System.err.println("Object has null name!");
 		if(type == null) System.err.println("Object has null type!");
 		if(data == null) System.err.println("Object has null data!");
-		return (isFinal == true) ? "final " : "" + type + " " + name + " = " + data + ";";
+		return ((isFinal == true) ? "final " : "") + type + " " + name + " = " + data + ";";
 	}
 	
 	@Override

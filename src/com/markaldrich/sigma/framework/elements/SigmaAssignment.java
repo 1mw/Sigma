@@ -5,12 +5,12 @@ package com.markaldrich.sigma.framework.elements;
  * @author maste
  * 
  */
-public class SigmaAssignment extends SigmaElement implements SigmaStatement {
-	public SigmaObject object;
+public class SigmaAssignment implements SigmaElement, SigmaStatement {
+	public String object;
 	public String dataToAssign;
 	
 	@Override
 	public String toString() {
-		return object.name + " = " + dataToAssign + ";";
+		return object + " = " + dataToAssign + ";";
 	}
 }

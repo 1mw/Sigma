@@ -1,0 +1,7 @@
+package com.markaldrich.sigma.framework.elements;
+
+import java.util.ArrayList;
+
+public class SigmaElseBlock {
+	public ArrayList<SigmaStatement> statements = new ArrayList<>();
+}

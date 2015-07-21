@@ -5,6 +5,6 @@ package com.markaldrich.sigma.framework.elements;
  * @author maste
  *
  */
-public interface SigmaStatement {
+public interface SigmaStatement extends SigmaElement {
 	
 }

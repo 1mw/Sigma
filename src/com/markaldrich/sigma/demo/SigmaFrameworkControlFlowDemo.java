@@ -29,16 +29,23 @@ public class SigmaFrameworkControlFlowDemo {
 					SigmaIfElseStatement isNumberEven = new SigmaIfElseStatement();
 					isNumberEven.condition = "number % 2 == 0";
 					{
-						SigmaMethodCall print = new SigmaMethodCall();
-						print.method = "System.out.println";
-						print.parameters.add("\"The number is even!\"");
-						isNumberEven.ifTrue.add(print);
-					}
-					{
-						SigmaMethodCall print = new SigmaMethodCall();
-						print.method = "System.out.println";
-						print.parameters.add("\"The number is odd!\"");
-						isNumberEven.ifFalse.add(print);
+						SigmaIfBlock ifBlock = new SigmaIfBlock();
+						{
+							SigmaMethodCall print = new SigmaMethodCall();
+							print.method = "System.out.println";
+							print.parameters.add("\"The number is even!\"");
+							isNumberEven.ifTrue.statements.add(print);
+						}
+						isNumberEven.ifTrue = ifBlock;
+						
+						SigmaElseBlock ifFalse = new SigmaElseBlock();
+						{
+							SigmaMethodCall print = new SigmaMethodCall();
+							print.method = "System.out.println";
+							print.parameters.add("\"The number is odd!\"");
+							isNumberEven.ifFalse.statements.add(print);
+						}
+						isNumberEven.ifFalse = ifFalse;
 					}
 					mainMethod.statements.add(isNumberEven);
 				}

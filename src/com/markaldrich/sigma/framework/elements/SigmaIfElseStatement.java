@@ -2,23 +2,23 @@ package com.markaldrich.sigma.framework.elements;
 
 import java.util.ArrayList;
 
-public class SigmaIfElseStatement extends SigmaElement implements SigmaStatement {
+public class SigmaIfElseStatement implements SigmaStatement, SigmaElement {
 	public String condition;
 	
-	public ArrayList<SigmaStatement> ifTrue = new ArrayList<>();
-	public ArrayList<SigmaStatement> ifFalse = new ArrayList<>();
+	public SigmaIfBlock ifTrue = new SigmaIfBlock();
+	public SigmaElseBlock ifFalse = new SigmaElseBlock();
 	
 	@Override
 	public String toString() {
 		String toReturn = "if(" + condition + ") {";
 		
-		for(SigmaStatement s : ifTrue) {
+		for(SigmaStatement s : ifTrue.statements) {
 			toReturn += s.toString();
 		}
 		
 		toReturn += "} else {";
 		
-		for(SigmaStatement s : ifFalse) {
+		for(SigmaStatement s : ifFalse.statements) {
 			toReturn += s.toString();
 		}
 		

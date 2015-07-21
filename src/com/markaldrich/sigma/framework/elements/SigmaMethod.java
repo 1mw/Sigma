@@ -8,7 +8,7 @@ import java.util.HashMap;
  * @author maste
  *
  */
-public class SigmaMethod extends SigmaElement {
+public class SigmaMethod implements SigmaElement {
 	
 	public String name;
 	public SigmaAccessModifier access;
