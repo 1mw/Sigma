@@ -30,4 +30,23 @@ public class SigmaMethodCall extends SigmaElement implements SigmaStatement {
 		
 		return toReturn;
 	}
+	
+	public String assignmentCall() {
+		if(method == null) System.err.println("Method call has no method to call!");
+		String toReturn = "";
+		
+		toReturn += method + "(";
+		
+		for(SigmaObject o : parameters) {
+			toReturn += o.name;
+			if(parameters.indexOf(o) == parameters.size() - 1) {
+			} else {
+				toReturn += ",";
+			}
+		}
+		
+		toReturn += ")";
+		
+		return toReturn;
+	}
 }
