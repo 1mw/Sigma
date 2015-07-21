@@ -40,10 +40,16 @@ public class SigmaFrameworkSquareRootDemo {
 				mainMethod.returnType = "void";
 				mainMethod.parameters.put("args", "String[]");
 				{
+					SigmaMethodCall getSquaredNumber = new SigmaMethodCall();
+					getSquaredNumber.method = "square";
+					getSquaredNumber.parameters.add(numberToSquare);
+					// Purposely not added to main method
+					
 					SigmaObject squaredNumber = new SigmaObject();
 					squaredNumber.name = "squaredNumber";
 					squaredNumber.type = "int";
-					squaredNumber.data = "square(numberToSquare)";
+					// Gets source to call the method in an assignment context
+					squaredNumber.data = getSquaredNumber.assignmentCall();
 					mainMethod.statements.add(squaredNumber);
 					
 					SigmaMethodCall printNumber = new SigmaMethodCall();
