@@ -3,7 +3,7 @@ package com.markaldrich.sigma.demo;
 import com.markaldrich.sigma.framework.elements.*;
 
 /**
- * A test of the SigmaFramework.
+ * A demo of the SigmaFramework.
  * @author maste
  *
  */
