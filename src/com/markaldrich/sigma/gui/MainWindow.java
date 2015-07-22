@@ -107,9 +107,7 @@ public class MainWindow implements TreeSelectionListener {
 										(element instanceof SigmaIfBlock) ? SigmaElementType.IF : 
 											(element instanceof SigmaElseBlock) ? SigmaElementType.ELSE : 
 												(element instanceof SigmaStatement) ? SigmaElementType.STATEMENT : SigmaElementType.UNKNOWN;
-						System.out.println(element);
-						System.out.println(type);
-						System.out.println(element.getClass().getName());
+
 						
 						System.out.println();
 						JPopupMenu menu = new JPopupMenu();
@@ -181,6 +179,28 @@ public class MainWindow implements TreeSelectionListener {
 								}
 							});
 							menu.add(addStatement);
+						}
+						
+						{
+							if(type != SigmaElementType.SCRIPT && map.get(selectedItem.getParent()) instanceof SigmaMethod) {
+								JMenuItem addStatementBelow = new JMenuItem("Add statement below");
+								addStatementBelow.addActionListener(new ActionListener() {
+									@Override
+									public void actionPerformed(ActionEvent arg0) {
+										new NewStatementWindow((SigmaMethod) map.get(selectedItem.getParent()), selectedItem.getParent().getIndex(selectedItem) + 1);
+									}
+								});
+								menu.add(addStatementBelow);
+								
+								JMenuItem addStatementHere = new JMenuItem("Add statement here");
+								addStatementHere.addActionListener(new ActionListener() {
+									@Override
+									public void actionPerformed(ActionEvent arg0) {
+										new NewStatementWindow((SigmaMethod) map.get(selectedItem.getParent()), selectedItem.getParent().getIndex(selectedItem));
+									}
+								});
+								menu.add(addStatementHere);
+							}
 						}
 						
 						if(type != SigmaElementType.IF || type != SigmaElementType.ELSE) {
