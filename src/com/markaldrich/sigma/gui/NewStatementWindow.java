@@ -14,16 +14,23 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import com.markaldrich.sigma.framework.elements.SigmaAssignment;
+import com.markaldrich.sigma.framework.elements.SigmaElement;
+import com.markaldrich.sigma.framework.elements.SigmaElseBlock;
+import com.markaldrich.sigma.framework.elements.SigmaIfBlock;
 import com.markaldrich.sigma.framework.elements.SigmaIfElseStatement;
 import com.markaldrich.sigma.framework.elements.SigmaMethod;
 import com.markaldrich.sigma.framework.elements.SigmaMethodCall;
 import com.markaldrich.sigma.framework.elements.SigmaObject;
 import com.markaldrich.sigma.framework.elements.SigmaReturnStatement;
+import com.markaldrich.sigma.framework.elements.SigmaStatement;
 
 public class NewStatementWindow {
 
 	private JFrame frame;
 	public SigmaMethod methodToAddTo;
+	public boolean isMethod;
+	public SigmaElement ifElseToAddTo;
+	public SigmaMethod ifElseToAddToParent;
 	public int index = -1;
 	private JTextField assignVariable;
 	private JTextField assignValue;
@@ -44,12 +51,31 @@ public class NewStatementWindow {
 	public NewStatementWindow(SigmaMethod methodToAddTo, int index) {
 		this.methodToAddTo = methodToAddTo;
 		this.index = index;
+		isMethod = true;
 		initialize();
 		frame.setVisible(true);
 	}
 	
 	public NewStatementWindow(SigmaMethod methodToAddTo) {
 		this.methodToAddTo = methodToAddTo;
+		isMethod = true;
+		initialize();
+		frame.setVisible(true);
+	}
+	
+	public NewStatementWindow(SigmaElement ifElseToAddTo, int index, SigmaMethod parent) {
+		this.ifElseToAddTo = ifElseToAddTo;
+		this.index = index;
+		isMethod = false;
+		ifElseToAddToParent = parent;
+		initialize();
+		frame.setVisible(true);
+	}
+	
+	public NewStatementWindow(SigmaElement ifElseToAddTo, SigmaMethod parent) {
+		this.ifElseToAddTo = ifElseToAddTo;
+		isMethod = false;
+		ifElseToAddToParent = parent;
 		initialize();
 		frame.setVisible(true);
 	}
@@ -126,17 +152,85 @@ public class NewStatementWindow {
 		JButton btnOk_3 = new JButton("OK");
 		btnOk_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SigmaIfElseStatement s = new SigmaIfElseStatement();
-				s.condition = ifThenElseIf.getText() + " == " + ifThenElseIs.getText();
+				SigmaIfElseStatement ss = new SigmaIfElseStatement();
+				ss.condition = ifThenElseIf.getText() + " == " + ifThenElseIs.getText();
 				
-				int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(methodToAddTo);
-				SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
-				if(index == -1) {
-					temp.statements.add(s);
+				if(isMethod) {
+					int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(methodToAddTo);
+					SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+					if(index == -1) {
+						temp.statements.add(ss);
+					} else {
+						temp.statements.add(index, ss);
+					}
+					MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 				} else {
-					temp.statements.add(index, s);
+					if(ifElseToAddTo instanceof SigmaIfBlock) {
+						SigmaIfBlock ifBlock = (SigmaIfBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifTrue == ifBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							ifBlock.statements.add(ss);
+						} else {
+							ifBlock.statements.add(index, ss);
+						}
+						ifElseTemp.ifTrue = ifBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					} else {
+						SigmaElseBlock elseBlock = (SigmaElseBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifFalse == elseBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							elseBlock.statements.add(ss);
+						} else {
+							elseBlock.statements.add(index, ss);
+						}
+						ifElseTemp.ifFalse = elseBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					}
 				}
-				MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 				frame.dispose();
 				MainWindow.updateInterface();
 			}
@@ -187,17 +281,84 @@ public class NewStatementWindow {
 					}
 				}
 				
-				int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(methodToAddTo);
-				SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
-				if(index == -1) {
-					temp.statements.add(c);
+				if(isMethod) {
+					int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(methodToAddTo);
+					SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+					if(index == -1) {
+						temp.statements.add(c);
+					} else {
+						temp.statements.add(index, c);
+					}
+					MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 				} else {
-					temp.statements.add(index, c);
+					if(ifElseToAddTo instanceof SigmaIfBlock) {
+						SigmaIfBlock ifBlock = (SigmaIfBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifTrue == ifBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							ifBlock.statements.add(c);
+						} else {
+							ifBlock.statements.add(index, c);
+						}
+						ifElseTemp.ifTrue = ifBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					} else {
+						SigmaElseBlock elseBlock = (SigmaElseBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifFalse == elseBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							elseBlock.statements.add(c);
+						} else {
+							elseBlock.statements.add(index, c);
+						}
+						ifElseTemp.ifFalse = elseBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					}
 				}
-				MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 				frame.dispose();
 				MainWindow.updateInterface();
-				
 			}
 		});
 		btnOk_2.setBounds(329, 205, 98, 26);
@@ -261,14 +422,82 @@ public class NewStatementWindow {
 				SigmaReturnStatement r = new SigmaReturnStatement();
 				r.objectReturning = returnValue.getText();
 				
-				int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(methodToAddTo);
-				SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
-				if(index == -1) {
-					temp.statements.add(r);
+				if(isMethod) {
+					int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(methodToAddTo);
+					SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+					if(index == -1) {
+						temp.statements.add(r);
+					} else {
+						temp.statements.add(index, r);
+					}
+					MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 				} else {
-					temp.statements.add(index, r);
+					if(ifElseToAddTo instanceof SigmaIfBlock) {
+						SigmaIfBlock ifBlock = (SigmaIfBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifTrue == ifBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							ifBlock.statements.add(r);
+						} else {
+							ifBlock.statements.add(index, r);
+						}
+						ifElseTemp.ifTrue = ifBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					} else {
+						SigmaElseBlock elseBlock = (SigmaElseBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifFalse == elseBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							elseBlock.statements.add(r);
+						} else {
+							elseBlock.statements.add(index, r);
+						}
+						ifElseTemp.ifFalse = elseBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					}
 				}
-				MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 				frame.dispose();
 				MainWindow.updateInterface();
 			}
@@ -297,14 +526,82 @@ public class NewStatementWindow {
 				a.object = assignVariable.getText();
 				a.dataToAssign = assignValue.getText();
 				
-				int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(methodToAddTo);
-				SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
-				if(index == -1) {
-					temp.statements.add(a);
+				if(isMethod) {
+					int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(methodToAddTo);
+					SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+					if(index == -1) {
+						temp.statements.add(a);
+					} else {
+						temp.statements.add(index, a);
+					}
+					MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 				} else {
-					temp.statements.add(index, a);
+					if(ifElseToAddTo instanceof SigmaIfBlock) {
+						SigmaIfBlock ifBlock = (SigmaIfBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifTrue == ifBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							ifBlock.statements.add(a);
+						} else {
+							ifBlock.statements.add(index, a);
+						}
+						ifElseTemp.ifTrue = ifBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					} else {
+						SigmaElseBlock elseBlock = (SigmaElseBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifFalse == elseBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							elseBlock.statements.add(a);
+						} else {
+							elseBlock.statements.add(index, a);
+						}
+						ifElseTemp.ifFalse = elseBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					}
 				}
-				MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 				frame.dispose();
 				MainWindow.updateInterface();
 			}
@@ -321,14 +618,82 @@ public class NewStatementWindow {
 				v.data = variableValue.getText();
 				v.isFinal = variableFinal.isSelected();
 				
-				int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(methodToAddTo);
-				SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
-				if(index == -1) {
-					temp.statements.add(v);
+				if(isMethod) {
+					int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(methodToAddTo);
+					SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+					if(index == -1) {
+						temp.statements.add(v);
+					} else {
+						temp.statements.add(index, v);
+					}
+					MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 				} else {
-					temp.statements.add(index, v);
+					if(ifElseToAddTo instanceof SigmaIfBlock) {
+						SigmaIfBlock ifBlock = (SigmaIfBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifTrue == ifBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							ifBlock.statements.add(v);
+						} else {
+							ifBlock.statements.add(index, v);
+						}
+						ifElseTemp.ifTrue = ifBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					} else {
+						SigmaElseBlock elseBlock = (SigmaElseBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifFalse == elseBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							elseBlock.statements.add(v);
+						} else {
+							elseBlock.statements.add(index, v);
+						}
+						ifElseTemp.ifFalse = elseBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					}
 				}
-				MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 				frame.dispose();
 				MainWindow.updateInterface();
 			}

@@ -10,4 +10,5 @@ public enum SigmaElementType {
 	IF_ELSE,
 	IF,
 	ELSE,
+	SCRIPT,
 }

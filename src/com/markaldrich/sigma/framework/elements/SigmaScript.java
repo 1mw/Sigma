@@ -1,6 +1,6 @@
 package com.markaldrich.sigma.framework.elements;
 
-public class SigmaScript {
+public class SigmaScript implements SigmaElement {
 	public SigmaClass mainClass;
 	
 	public String getSource() {

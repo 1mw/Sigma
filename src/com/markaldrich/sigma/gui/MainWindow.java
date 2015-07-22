@@ -100,13 +100,18 @@ public class MainWindow implements TreeSelectionListener {
 					if(pathBounds != null && pathBounds.contains(e.getX(), e.getY())) {
 						DefaultMutableTreeNode selectedItem = (DefaultMutableTreeNode) path.getLastPathComponent();
 						SigmaElement element = map.get(selectedItem);
-						final SigmaElementType type = (element instanceof SigmaGlobalVariable) ? SigmaElementType.GLOBAL_VARIABLE : 
-							(element instanceof SigmaMethod) ? SigmaElementType.METHOD : 
-								(element instanceof SigmaStatement) ? SigmaElementType.STATEMENT : 
+						final SigmaElementType type = (element instanceof SigmaGlobalVariable) ? SigmaElementType.GLOBAL_VARIABLE :
+							(element instanceof SigmaScript) ? SigmaElementType.SCRIPT : 
+								(element instanceof SigmaMethod) ? SigmaElementType.METHOD :  
 									(element instanceof SigmaIfElseStatement) ? SigmaElementType.IF_ELSE : 
 										(element instanceof SigmaIfBlock) ? SigmaElementType.IF : 
-											(element instanceof SigmaElseBlock) ? SigmaElementType.ELSE : SigmaElementType.UNKNOWN;
+											(element instanceof SigmaElseBlock) ? SigmaElementType.ELSE : 
+												(element instanceof SigmaStatement) ? SigmaElementType.STATEMENT : SigmaElementType.UNKNOWN;
+						System.out.println(element);
+						System.out.println(type);
+						System.out.println(element.getClass().getName());
 						
+						System.out.println();
 						JPopupMenu menu = new JPopupMenu();
 						if(type == SigmaElementType.METHOD) {
 							JMenuItem addStatement = new JMenuItem("Add statement");
@@ -118,12 +123,61 @@ public class MainWindow implements TreeSelectionListener {
 							});
 							menu.add(addStatement);
 						}
+						a:
+						if(type == SigmaElementType.SCRIPT) {
+							for(SigmaMethod m : script.mainClass.methods) {
+								if(m.name.equals("main")) {
+									break a;
+								}
+							}
+							JMenuItem addEntryPoint = new JMenuItem("Add entry point to program");
+							addEntryPoint.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(ActionEvent arg0) {
+									SigmaMethod mainMethod = new SigmaMethod();
+									mainMethod.name = "main";
+									mainMethod.isStatic = true;
+									mainMethod.returnType = "void";
+									mainMethod.access = SigmaAccessModifier.PUBLIC;
+									mainMethod.parameters.put("args", "String[]");
+									script.mainClass.methods.add(mainMethod);
+									updateInterface();
+								}
+							});
+							menu.add(addEntryPoint);
+						}
 						if(type == SigmaElementType.IF) {
 							JMenuItem addStatement = new JMenuItem("Add statement");
 							addStatement.addActionListener(new ActionListener() {
 								@Override
 								public void actionPerformed(ActionEvent arg0) {
-									new NewStatementWindow((SigmaMethod) element);
+									TreePath parentMethodPath = path.getParentPath();
+									for(int i = 0; i < path.getPathCount(); i++) {
+										if(map.get(parentMethodPath.getLastPathComponent()) instanceof SigmaMethod) {
+											new NewStatementWindow(element, ((SigmaMethod) map.get(parentMethodPath.getLastPathComponent())));
+											break;
+										}
+										parentMethodPath = parentMethodPath.getParentPath();
+									}
+								}
+							});
+							menu.add(addStatement);
+						}
+						if(type == SigmaElementType.ELSE) {
+							System.out.println("e");
+							JMenuItem addStatement = new JMenuItem("Add statement");
+							addStatement.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(ActionEvent arg0) {
+									TreePath parentMethodPath;
+									for(int i = 0; i < path.getPathCount(); i++) {
+										parentMethodPath = path.getParentPath();
+										System.out.println("Current parent path: " + parentMethodPath);
+										if(map.get(parentMethodPath.getLastPathComponent()) instanceof SigmaMethod) {
+											new NewStatementWindow(element, ((SigmaMethod) map.get(parentMethodPath.getLastPathComponent())));
+											break;
+										}
+									}
 								}
 							});
 							menu.add(addStatement);
@@ -213,6 +267,8 @@ public class MainWindow implements TreeSelectionListener {
 		top.removeAllChildren();
 		map.clear();
 		
+		map.put(top, script);
+		
 		for(SigmaGlobalVariable gv : script.mainClass.globalVariables) {
 			DefaultMutableTreeNode n = new DefaultMutableTreeNode(gv.name);
 			top.add(n);
@@ -275,6 +331,8 @@ public class MainWindow implements TreeSelectionListener {
 			for(SigmaStatement st : ((SigmaIfElseStatement) s).ifFalse.statements) {
 				updateStatement(st, elseBlock);
 			}
+			map.put(thenBlock, ((SigmaIfElseStatement) s).ifTrue);
+			map.put(elseBlock, ((SigmaIfElseStatement) s).ifFalse);
 			statement.add(thenBlock);
 			statement.add(elseBlock);
 			n.add(statement);
@@ -284,119 +342,4 @@ public class MainWindow implements TreeSelectionListener {
 			map.put(statement, (SigmaElement) s);
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	/*
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public static synchronized void updateInterface() {
-		top.removeAllChildren();
-		map.clear();
-		
-		for(SigmaGlobalVariable gv : script.mainClass.globalVariables) {
-			DefaultMutableTreeNode n = new DefaultMutableTreeNode(gv.name);
-			top.add(n);
-			map.put(n, gv);
-		}
-		for(SigmaMethod m : script.mainClass.methods) {
-			DefaultMutableTreeNode n = updateStatementsInMethod(m);
-			
-		}
-		model.reload();
-	}
-	
-	public static DefaultMutableTreeNode updateStatementsInMethod(SigmaMethod m) {
-		String signature = (m.access == SigmaAccessModifier.NONE) ? "" : (m.access.toString().toLowerCase() + " ")
-				+ ((m.isStatic) ? "static " : "") + m.returnType + " " + m.name + "(";
-		{
-			int i = 0;
-			int size = m.parameters.size();
-			for(String type : m.parameters.values()) {
-				if(i == size - 1) {
-					signature += type + " ";
-				} else {
-					signature += type + ", ";
-				}
-				i++;
-			}
-		}
-		signature += ")";
-		DefaultMutableTreeNode n = new DefaultMutableTreeNode(signature);
-		
-		for(SigmaStatement s : m.statements) {
-			if(s instanceof SigmaAssignment) {
-				DefaultMutableTreeNode statement = new DefaultMutableTreeNode(((SigmaAssignment) s).object + 
-						" equals " + ((SigmaAssignment) s).dataToAssign);
-				n.add(statement);
-				map.put(statement, (SigmaAssignment) s);
-			} else if(s instanceof SigmaObject) {
-				DefaultMutableTreeNode statement = new DefaultMutableTreeNode("New: " + ((SigmaObject) s).name + " equals " + ((SigmaObject) s).data);
-				n.add(statement);
-				map.put(statement, (SigmaElement) s);
-			} else if(s instanceof SigmaIfElseStatement) {
-				updateStatementsInIfElseStatement((SigmaIfElseStatement) s);
-			} else {
-				DefaultMutableTreeNode statement = new DefaultMutableTreeNode(s.toString());
-				n.add(statement);
-				map.put(statement, (SigmaElement) s);
-			}
-		}
-		
-		top.add(n);
-		map.put(n, m);
-	}
-	
-	public static DefaultMutableTreeNode updateStatementsInIfElseStatement(SigmaIfElseStatement ifElseStatement) {
-		for(SigmaStatement s : ifElseStatement.ifTrue) {
-			if(s instanceof SigmaAssignment) {
-				DefaultMutableTreeNode statement = new DefaultMutableTreeNode(((SigmaAssignment) s).object + 
-						" equals " + ((SigmaAssignment) s).dataToAssign);
-				n.add(statement);
-				map.put(statement, (SigmaAssignment) s);
-			} else if(s instanceof SigmaObject) {
-				DefaultMutableTreeNode statement = new DefaultMutableTreeNode("New: " + ((SigmaObject) s).name + " equals " + ((SigmaObject) s).data);
-				n.add(statement);
-				map.put(statement, (SigmaElement) s);
-			} else if(s instanceof SigmaIfElseStatement) {
-				 SigmaIfElseStatement ie = (SigmaIfElseStatement) s;
-				 DefaultMutableTreeNode ifElse = new DefaultMutableTreeNode("If " + ie.condition.split(" == ")[0] + " is " + ie.condition.split(" == ")[0]);
-				 DefaultMutableTreeNode thenBlock = new DefaultMutableTreeNode("Then");
-				 
-				 
-				 
-				 DefaultMutableTreeNode elseBlock = new DefaultMutableTreeNode("Else");
-				 
-				 
-				 
-				 ifElse.add(thenBlock);
-				 ifElse.add(elseBlock);
-				 n.add(ifElse);
-				 map.put(ifElse, ie);
-			} else {
-				DefaultMutableTreeNode statement = new DefaultMutableTreeNode(s.toString());
-				n.add(statement);
-				map.put(statement, (SigmaElement) s);
-			}
-		}
-	}*/
 }

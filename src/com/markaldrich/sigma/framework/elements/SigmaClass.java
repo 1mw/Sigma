@@ -13,12 +13,16 @@ public class SigmaClass implements SigmaElement {
 	public SigmaAccessModifier access;
 	public ArrayList<SigmaGlobalVariable> globalVariables = new ArrayList<>();
 	public ArrayList<SigmaMethod> methods = new ArrayList<>();
+	public ArrayList<String> imports = new ArrayList<>();
 	
 	@Override
 	public String toString() {
 		if(name == null) System.err.println("Class has null name!");
 		if(access == null) System.err.println("Class has null access modifier!");
 		String toReturn = "";
+		for(String s : imports) {
+			toReturn += "import " + s + ";";
+		}
 		toReturn += (access == SigmaAccessModifier.NONE) ? "" : (access.toString().toLowerCase() + " ");
 		toReturn += "class " + name + " {";
 		

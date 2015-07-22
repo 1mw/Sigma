@@ -53,6 +53,7 @@ public class NewWindow {
 	private JTextField txtNameMethod;
 	private JTextField txtParameterTypeMethod;
 	private JTextField txtParameterNameMethod;
+	private JTextField importName;
 	
 	/**
 	 * Create the application.
@@ -286,6 +287,43 @@ public class NewWindow {
 		txtParameterNameMethod.setBounds(155, 128, 190, 20);
 		newMethod.add(txtParameterNameMethod);
 		txtParameterNameMethod.setColumns(10);
+		
+		JPanel importPanel = new JPanel();
+		tabbedPane.addTab("Import", null, importPanel, null);
+		importPanel.setLayout(null);
+		
+		JLabel lblFully = new JLabel("Fully qualified name:");
+		lblFully.setBounds(12, 12, 150, 16);
+		importPanel.add(lblFully);
+		
+		importName = new JTextField();
+		importName.setBounds(180, 10, 247, 20);
+		importPanel.add(importName);
+		importName.setColumns(10);
+		
+		JButton btnOk_2 = new JButton("OK");
+		btnOk_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(importName.getText().equals("")) {
+					Toolkit.getDefaultToolkit().beep();
+					return;
+				}
+				MainWindow.script.mainClass.imports.add(importName.getText());
+				frame.dispose();
+				MainWindow.updateInterface();
+			}
+		});
+		btnOk_2.setBounds(329, 205, 98, 26);
+		importPanel.add(btnOk_2);
+		
+		JButton btnCancel_2 = new JButton("Cancel");
+		btnCancel_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
+		});
+		btnCancel_2.setBounds(219, 205, 98, 26);
+		importPanel.add(btnCancel_2);
 		
 	}
 	
