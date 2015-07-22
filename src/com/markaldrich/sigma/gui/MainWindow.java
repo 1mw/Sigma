@@ -2,10 +2,12 @@ package com.markaldrich.sigma.gui;
 
 import java.awt.EventQueue;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Collections;
 import java.util.HashMap;
 
 import javax.swing.JButton;
@@ -200,6 +202,36 @@ public class MainWindow implements TreeSelectionListener {
 									}
 								});
 								menu.add(addStatementHere);
+								
+								JMenuItem moveUp = new JMenuItem("Move statement up");
+								moveUp.addActionListener(new ActionListener() {
+									@Override
+									public void actionPerformed(ActionEvent arg0) {
+										if(selectedItem.getParent().getIndex(selectedItem) == 0) {
+											Toolkit.getDefaultToolkit().beep();
+											return;
+										}
+										SigmaMethod parent = (SigmaMethod) map.get(selectedItem.getParent());
+										Collections.swap(parent.statements, selectedItem.getParent().getIndex(selectedItem), selectedItem.getParent().getIndex(selectedItem) - 1);
+										updateInterface();
+									}
+								});
+								menu.add(moveUp);
+								
+								JMenuItem moveDown = new JMenuItem("Move statement down");
+								moveDown.addActionListener(new ActionListener() {
+									@Override
+									public void actionPerformed(ActionEvent arg0) {
+										if(selectedItem.getParent().getIndex(selectedItem) == selectedItem.getParent().getChildCount() - 1) {
+											Toolkit.getDefaultToolkit().beep();
+											return;
+										}
+										SigmaMethod parent = (SigmaMethod) map.get(selectedItem.getParent());
+										Collections.swap(parent.statements, selectedItem.getParent().getIndex(selectedItem), selectedItem.getParent().getIndex(selectedItem) + 1);
+										updateInterface();
+									}
+								});
+								menu.add(moveDown);
 							}
 						}
 						
