@@ -268,15 +268,6 @@ public class MainWindow implements TreeSelectionListener {
 		model = (DefaultTreeModel) tree.getModel();
 		frame.getContentPane().add(tree);
 		
-		JButton btnUpdate = new JButton("Update");
-		btnUpdate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				updateInterface();
-			}
-		});
-		btnUpdate.setBounds(491, 218, 89, 23);
-		frame.getContentPane().add(btnUpdate);
-		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu file = new JMenu("File");
 		menuBar.add(file);

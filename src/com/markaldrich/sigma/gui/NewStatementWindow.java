@@ -41,6 +41,7 @@ public class NewStatementWindow {
 	private JTextField methodArguments;
 	private JTextField ifThenElseIf;
 	private JTextField ifThenElseIs;
+	private JTextField dataConsolePrint;
 
 	/**
 	 * Create the application.
@@ -86,7 +87,7 @@ public class NewStatementWindow {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setResizable(false);
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 450, 319);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -700,5 +701,117 @@ public class NewStatementWindow {
 		});
 		btnNewButton.setBounds(329, 205, 98, 26);
 		variablePanel.add(btnNewButton);
+		
+		JPanel consolePrintPanel = new JPanel();
+		tabbedPane.addTab("Print to console", null, consolePrintPanel, null);
+		consolePrintPanel.setLayout(null);
+		
+		JLabel lblDataToPrint = new JLabel("Data to print:");
+		lblDataToPrint.setBounds(12, 12, 120, 16);
+		consolePrintPanel.add(lblDataToPrint);
+		
+		dataConsolePrint = new JTextField();
+		dataConsolePrint.setBounds(150, 10, 114, 20);
+		consolePrintPanel.add(dataConsolePrint);
+		dataConsolePrint.setColumns(10);
+		
+		JButton btnOk_4 = new JButton("OK");
+		btnOk_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SigmaMethodCall c = new SigmaMethodCall();
+				c.method = "System.out.println";
+				c.parameters.add(dataConsolePrint.getText());
+				
+				if(isMethod) {
+					int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(methodToAddTo);
+					SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+					if(index == -1) {
+						temp.statements.add(c);
+					} else {
+						temp.statements.add(index, c);
+					}
+					MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+				} else {
+					if(ifElseToAddTo instanceof SigmaIfBlock) {
+						SigmaIfBlock ifBlock = (SigmaIfBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifTrue == ifBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							ifBlock.statements.add(c);
+						} else {
+							ifBlock.statements.add(index, c);
+						}
+						ifElseTemp.ifTrue = ifBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					} else {
+						SigmaElseBlock elseBlock = (SigmaElseBlock) ifElseToAddTo;
+						
+						// Get parent method
+						int indexOfMethod = MainWindow.script.mainClass.methods.indexOf(ifElseToAddToParent);
+						SigmaMethod temp = MainWindow.script.mainClass.methods.get(indexOfMethod);
+						
+						// Get parent if/else statement
+						int indexOfIfElseStatement = -1;
+						for(SigmaStatement s : temp.statements) {
+							if(s instanceof SigmaIfElseStatement) {
+								if(((SigmaIfElseStatement) s).ifFalse == elseBlock) {
+									indexOfIfElseStatement = temp.statements.indexOf(s);
+								}
+							}
+						}
+						if(indexOfIfElseStatement == -1) {
+							System.err.println("indexOfIfElseStatement == -1");
+							return;
+						}
+						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+								MainWindow.script.mainClass.methods.get(indexOfMethod)
+								.statements.get(indexOfIfElseStatement);
+						
+						if(index == -1) {
+							elseBlock.statements.add(c);
+						} else {
+							elseBlock.statements.add(index, c);
+						}
+						ifElseTemp.ifFalse = elseBlock;
+						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
+					}
+				}
+				frame.dispose();
+				MainWindow.updateInterface();
+			}
+		});
+		btnOk_4.setBounds(329, 205, 98, 26);
+		consolePrintPanel.add(btnOk_4);
+		
+		JButton btnCancel_4 = new JButton("Cancel");
+		btnCancel_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				frame.dispose();
+			}
+		});
+		btnCancel_4.setBounds(219, 205, 98, 26);
+		consolePrintPanel.add(btnCancel_4);
 	}
 }
