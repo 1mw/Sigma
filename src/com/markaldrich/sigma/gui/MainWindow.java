@@ -7,19 +7,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.HashMap;
 
-import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -29,6 +34,7 @@ import com.markaldrich.sigma.framework.elements.SigmaAccessModifier;
 import com.markaldrich.sigma.framework.elements.SigmaAssignment;
 import com.markaldrich.sigma.framework.elements.SigmaClass;
 import com.markaldrich.sigma.framework.elements.SigmaElement;
+import com.markaldrich.sigma.framework.elements.SigmaElementType;
 import com.markaldrich.sigma.framework.elements.SigmaElseBlock;
 import com.markaldrich.sigma.framework.elements.SigmaGlobalVariable;
 import com.markaldrich.sigma.framework.elements.SigmaIfBlock;
@@ -37,7 +43,6 @@ import com.markaldrich.sigma.framework.elements.SigmaMethod;
 import com.markaldrich.sigma.framework.elements.SigmaObject;
 import com.markaldrich.sigma.framework.elements.SigmaScript;
 import com.markaldrich.sigma.framework.elements.SigmaStatement;
-import com.markaldrich.sigma.framework.elements.SigmaElementType;
 
 
 public class MainWindow implements TreeSelectionListener {
@@ -91,7 +96,7 @@ public class MainWindow implements TreeSelectionListener {
 		
 		top = new DefaultMutableTreeNode("Program");
 		tree = new JTree(top);
-		tree.setBounds(0, 0, 391, 569);
+		tree.setBounds(0, 0, 391, 548);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.addMouseListener(new MouseAdapter() {
 			@Override
@@ -288,6 +293,32 @@ public class MainWindow implements TreeSelectionListener {
 				System.out.println(script.getSource());
 			}
 		});
+		
+		JMenuItem mntmSaveSourceAs = new JMenuItem("Save source as...");
+		mntmSaveSourceAs.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser fc = new JFileChooser();
+				fc.setFileFilter(new FileNameExtensionFilter("Java source files", "java"));
+				JOptionPane.showMessageDialog(frame, "The main class in your program is titled \"" + script.mainClass.name + "\".\nFor your program to compile correctly, you must save your file with that name.\nTo compile your program, run \"javac filename.java\" from the command line.\n(Note: you must have the JDK installed to compile Java programs. If you are running Windows, you must also set your PATH environment variable to include \"javac.exe\".)\nTo run your program, run \"java -cp . filename\"\n(Note: You must have the JRE or JDK installed to run Java programs. Also note that you do not type any file extension while running.)");
+				int response = fc.showOpenDialog(frame);
+				if(response == JFileChooser.APPROVE_OPTION) {
+					File file = new File(fc.getSelectedFile().getAbsolutePath());
+					PrintWriter writer;
+					try {
+						writer = new PrintWriter(file);
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(frame, "There was an error saving the file.");
+						return;
+					}
+					writer.println(script.getSource());
+					writer.close();
+					JOptionPane.showMessageDialog(frame, "Successfully saved file at " + fc.getSelectedFile().getAbsolutePath());
+				}
+			}
+		});
+		file.add(mntmSaveSourceAs);
 		file.add(printToConsoleItem);
 		
 		frame.setJMenuBar(menuBar);
