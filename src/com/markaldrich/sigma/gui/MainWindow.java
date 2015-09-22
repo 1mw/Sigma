@@ -201,14 +201,10 @@ public class MainWindow implements TreeSelectionListener {
 										@Override
 										public void actionPerformed(
 												ActionEvent arg0) {
-											TreePath parentMethodPath;
+											TreePath parentMethodPath = path
+													.getParentPath();
 											for (int i = 0; i < path
 													.getPathCount(); i++) {
-												parentMethodPath = path
-														.getParentPath();
-												System.out
-														.println("Current parent path: "
-																+ parentMethodPath);
 												if (map.get(parentMethodPath
 														.getLastPathComponent()) instanceof SigmaMethod) {
 													new NewStatementWindow(
@@ -218,6 +214,8 @@ public class MainWindow implements TreeSelectionListener {
 																			.getLastPathComponent())));
 													break;
 												}
+												parentMethodPath = parentMethodPath
+														.getParentPath();
 											}
 										}
 									});
