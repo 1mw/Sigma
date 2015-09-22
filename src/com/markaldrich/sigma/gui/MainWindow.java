@@ -43,7 +43,7 @@ import com.markaldrich.sigma.framework.elements.SigmaMethod;
 import com.markaldrich.sigma.framework.elements.SigmaObject;
 import com.markaldrich.sigma.framework.elements.SigmaScript;
 import com.markaldrich.sigma.framework.elements.SigmaStatement;
-
+import java.awt.Font;
 
 public class MainWindow implements TreeSelectionListener {
 
@@ -52,7 +52,7 @@ public class MainWindow implements TreeSelectionListener {
 	protected static DefaultTreeModel model;
 	protected static DefaultMutableTreeNode top;
 	private static HashMap<DefaultMutableTreeNode, SigmaElement> map = new HashMap<>();
-	
+
 	public static SigmaScript script = new SigmaScript();
 	static {
 		SigmaClass main = new SigmaClass();
@@ -93,178 +93,270 @@ public class MainWindow implements TreeSelectionListener {
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
-		
+
 		top = new DefaultMutableTreeNode("Program");
 		tree = new JTree(top);
+		tree.setFont(new Font("Lucida Console", Font.PLAIN, 11));
 		tree.setBounds(0, 0, 391, 548);
-		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tree.getSelectionModel().setSelectionMode(
+				TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if(SwingUtilities.isRightMouseButton(e)) {
+				if (SwingUtilities.isRightMouseButton(e)) {
 					TreePath path = tree.getPathForLocation(e.getX(), e.getY());
-					Rectangle pathBounds = tree.getUI().getPathBounds(tree, path);
-					if(pathBounds != null && pathBounds.contains(e.getX(), e.getY())) {
-						DefaultMutableTreeNode selectedItem = (DefaultMutableTreeNode) path.getLastPathComponent();
+					Rectangle pathBounds = tree.getUI().getPathBounds(tree,
+							path);
+					if (pathBounds != null
+							&& pathBounds.contains(e.getX(), e.getY())) {
+						DefaultMutableTreeNode selectedItem = (DefaultMutableTreeNode) path
+								.getLastPathComponent();
 						SigmaElement element = map.get(selectedItem);
-						final SigmaElementType type = (element instanceof SigmaGlobalVariable) ? SigmaElementType.GLOBAL_VARIABLE :
-							(element instanceof SigmaScript) ? SigmaElementType.SCRIPT : 
-								(element instanceof SigmaMethod) ? SigmaElementType.METHOD :  
-									(element instanceof SigmaIfElseStatement) ? SigmaElementType.IF_ELSE : 
-										(element instanceof SigmaIfBlock) ? SigmaElementType.IF : 
-											(element instanceof SigmaElseBlock) ? SigmaElementType.ELSE : 
-												(element instanceof SigmaStatement) ? SigmaElementType.STATEMENT : SigmaElementType.UNKNOWN;
+						final SigmaElementType type = (element instanceof SigmaGlobalVariable) ? SigmaElementType.GLOBAL_VARIABLE
+								: (element instanceof SigmaScript) ? SigmaElementType.SCRIPT
+										: (element instanceof SigmaMethod) ? SigmaElementType.METHOD
+												: (element instanceof SigmaIfElseStatement) ? SigmaElementType.IF_ELSE
+														: (element instanceof SigmaIfBlock) ? SigmaElementType.IF
+																: (element instanceof SigmaElseBlock) ? SigmaElementType.ELSE
+																		: (element instanceof SigmaStatement) ? SigmaElementType.STATEMENT
+																				: SigmaElementType.UNKNOWN;
 
-						
 						System.out.println();
 						JPopupMenu menu = new JPopupMenu();
-						if(type == SigmaElementType.METHOD) {
-							JMenuItem addStatement = new JMenuItem("Add statement");
-							addStatement.addActionListener(new ActionListener() {
-								@Override
-								public void actionPerformed(ActionEvent arg0) {
-									new NewStatementWindow((SigmaMethod) element);
-								}
-							});
+						if (type == SigmaElementType.METHOD) {
+							JMenuItem addStatement = new JMenuItem(
+									"Add statement");
+							addStatement
+									.addActionListener(new ActionListener() {
+										@Override
+										public void actionPerformed(
+												ActionEvent arg0) {
+											new NewStatementWindow(
+													(SigmaMethod) element);
+										}
+									});
 							menu.add(addStatement);
 						}
-						a:
-						if(type == SigmaElementType.SCRIPT) {
-							for(SigmaMethod m : script.mainClass.methods) {
-								if(m.name.equals("main")) {
+						a: if (type == SigmaElementType.SCRIPT) {
+							for (SigmaMethod m : script.mainClass.methods) {
+								if (m.name.equals("main")) {
 									break a;
 								}
 							}
-							JMenuItem addEntryPoint = new JMenuItem("Add entry point to program");
-							addEntryPoint.addActionListener(new ActionListener() {
-								@Override
-								public void actionPerformed(ActionEvent arg0) {
-									SigmaMethod mainMethod = new SigmaMethod();
-									mainMethod.name = "main";
-									mainMethod.isStatic = true;
-									mainMethod.returnType = "void";
-									mainMethod.access = SigmaAccessModifier.PUBLIC;
-									mainMethod.parameters.put("args", "String[]");
-									script.mainClass.methods.add(mainMethod);
-									updateInterface();
-								}
-							});
+							JMenuItem addEntryPoint = new JMenuItem(
+									"Add entry point to program");
+							addEntryPoint
+									.addActionListener(new ActionListener() {
+										@Override
+										public void actionPerformed(
+												ActionEvent arg0) {
+											SigmaMethod mainMethod = new SigmaMethod();
+											mainMethod.name = "main";
+											mainMethod.isStatic = true;
+											mainMethod.returnType = "void";
+											mainMethod.access = SigmaAccessModifier.PUBLIC;
+											mainMethod.parameters.put("args",
+													"String[]");
+											script.mainClass.methods
+													.add(mainMethod);
+											updateInterface();
+										}
+									});
 							menu.add(addEntryPoint);
 						}
-						if(type == SigmaElementType.IF) {
-							JMenuItem addStatement = new JMenuItem("Add statement");
-							addStatement.addActionListener(new ActionListener() {
-								@Override
-								public void actionPerformed(ActionEvent arg0) {
-									TreePath parentMethodPath = path.getParentPath();
-									for(int i = 0; i < path.getPathCount(); i++) {
-										if(map.get(parentMethodPath.getLastPathComponent()) instanceof SigmaMethod) {
-											new NewStatementWindow(element, ((SigmaMethod) map.get(parentMethodPath.getLastPathComponent())));
-											break;
+						if (type == SigmaElementType.IF) {
+							JMenuItem addStatement = new JMenuItem(
+									"Add statement");
+							addStatement
+									.addActionListener(new ActionListener() {
+										@Override
+										public void actionPerformed(
+												ActionEvent arg0) {
+											TreePath parentMethodPath = path
+													.getParentPath();
+											for (int i = 0; i < path
+													.getPathCount(); i++) {
+												if (map.get(parentMethodPath
+														.getLastPathComponent()) instanceof SigmaMethod) {
+													new NewStatementWindow(
+															element,
+															((SigmaMethod) map
+																	.get(parentMethodPath
+																			.getLastPathComponent())));
+													break;
+												}
+												parentMethodPath = parentMethodPath
+														.getParentPath();
+											}
 										}
-										parentMethodPath = parentMethodPath.getParentPath();
-									}
-								}
-							});
+									});
 							menu.add(addStatement);
 						}
-						if(type == SigmaElementType.ELSE) {
+						if (type == SigmaElementType.ELSE) {
 							System.out.println("e");
-							JMenuItem addStatement = new JMenuItem("Add statement");
-							addStatement.addActionListener(new ActionListener() {
-								@Override
-								public void actionPerformed(ActionEvent arg0) {
-									TreePath parentMethodPath;
-									for(int i = 0; i < path.getPathCount(); i++) {
-										parentMethodPath = path.getParentPath();
-										System.out.println("Current parent path: " + parentMethodPath);
-										if(map.get(parentMethodPath.getLastPathComponent()) instanceof SigmaMethod) {
-											new NewStatementWindow(element, ((SigmaMethod) map.get(parentMethodPath.getLastPathComponent())));
-											break;
+							JMenuItem addStatement = new JMenuItem(
+									"Add statement");
+							addStatement
+									.addActionListener(new ActionListener() {
+										@Override
+										public void actionPerformed(
+												ActionEvent arg0) {
+											TreePath parentMethodPath;
+											for (int i = 0; i < path
+													.getPathCount(); i++) {
+												parentMethodPath = path
+														.getParentPath();
+												System.out
+														.println("Current parent path: "
+																+ parentMethodPath);
+												if (map.get(parentMethodPath
+														.getLastPathComponent()) instanceof SigmaMethod) {
+													new NewStatementWindow(
+															element,
+															((SigmaMethod) map
+																	.get(parentMethodPath
+																			.getLastPathComponent())));
+													break;
+												}
+											}
 										}
-									}
-								}
-							});
+									});
 							menu.add(addStatement);
 						}
-						
+
 						{
-							if(type != SigmaElementType.SCRIPT && map.get(selectedItem.getParent()) instanceof SigmaMethod) {
-								JMenuItem addStatementBelow = new JMenuItem("Add statement below");
-								addStatementBelow.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent arg0) {
-										new NewStatementWindow((SigmaMethod) map.get(selectedItem.getParent()), selectedItem.getParent().getIndex(selectedItem) + 1);
-									}
-								});
+							if (type != SigmaElementType.SCRIPT
+									&& map.get(selectedItem.getParent()) instanceof SigmaMethod) {
+								JMenuItem addStatementBelow = new JMenuItem(
+										"Add statement below");
+								addStatementBelow
+										.addActionListener(new ActionListener() {
+											@Override
+											public void actionPerformed(
+													ActionEvent arg0) {
+												new NewStatementWindow(
+														(SigmaMethod) map
+																.get(selectedItem
+																		.getParent()),
+														selectedItem
+																.getParent()
+																.getIndex(
+																		selectedItem) + 1);
+											}
+										});
 								menu.add(addStatementBelow);
-								
-								JMenuItem addStatementHere = new JMenuItem("Add statement here");
-								addStatementHere.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent arg0) {
-										new NewStatementWindow((SigmaMethod) map.get(selectedItem.getParent()), selectedItem.getParent().getIndex(selectedItem));
-									}
-								});
+
+								JMenuItem addStatementHere = new JMenuItem(
+										"Add statement here");
+								addStatementHere
+										.addActionListener(new ActionListener() {
+											@Override
+											public void actionPerformed(
+													ActionEvent arg0) {
+												new NewStatementWindow(
+														(SigmaMethod) map
+																.get(selectedItem
+																		.getParent()),
+														selectedItem
+																.getParent()
+																.getIndex(
+																		selectedItem));
+											}
+										});
 								menu.add(addStatementHere);
-								
-								JMenuItem moveUp = new JMenuItem("Move statement up");
+
+								JMenuItem moveUp = new JMenuItem(
+										"Move statement up");
 								moveUp.addActionListener(new ActionListener() {
 									@Override
 									public void actionPerformed(ActionEvent arg0) {
-										if(selectedItem.getParent().getIndex(selectedItem) == 0) {
+										if (selectedItem.getParent().getIndex(
+												selectedItem) == 0) {
 											Toolkit.getDefaultToolkit().beep();
 											return;
 										}
-										SigmaMethod parent = (SigmaMethod) map.get(selectedItem.getParent());
-										Collections.swap(parent.statements, selectedItem.getParent().getIndex(selectedItem), selectedItem.getParent().getIndex(selectedItem) - 1);
+										SigmaMethod parent = (SigmaMethod) map
+												.get(selectedItem.getParent());
+										Collections
+												.swap(parent.statements,
+														selectedItem
+																.getParent()
+																.getIndex(
+																		selectedItem),
+														selectedItem
+																.getParent()
+																.getIndex(
+																		selectedItem) - 1);
 										updateInterface();
 									}
 								});
 								menu.add(moveUp);
-								
-								JMenuItem moveDown = new JMenuItem("Move statement down");
+
+								JMenuItem moveDown = new JMenuItem(
+										"Move statement down");
 								moveDown.addActionListener(new ActionListener() {
 									@Override
 									public void actionPerformed(ActionEvent arg0) {
-										if(selectedItem.getParent().getIndex(selectedItem) == selectedItem.getParent().getChildCount() - 1) {
+										if (selectedItem.getParent().getIndex(
+												selectedItem) == selectedItem
+												.getParent().getChildCount() - 1) {
 											Toolkit.getDefaultToolkit().beep();
 											return;
 										}
-										SigmaMethod parent = (SigmaMethod) map.get(selectedItem.getParent());
-										Collections.swap(parent.statements, selectedItem.getParent().getIndex(selectedItem), selectedItem.getParent().getIndex(selectedItem) + 1);
+										SigmaMethod parent = (SigmaMethod) map
+												.get(selectedItem.getParent());
+										Collections
+												.swap(parent.statements,
+														selectedItem
+																.getParent()
+																.getIndex(
+																		selectedItem),
+														selectedItem
+																.getParent()
+																.getIndex(
+																		selectedItem) + 1);
 										updateInterface();
 									}
 								});
 								menu.add(moveDown);
 							}
 						}
-						
-						if(type != SigmaElementType.IF || type != SigmaElementType.ELSE) {
-							JMenuItem delete = new JMenuItem("Delete " + type.toString().toLowerCase().replace('_', ' '));
+
+						if (type != SigmaElementType.IF
+								|| type != SigmaElementType.ELSE) {
+							JMenuItem delete = new JMenuItem("Delete "
+									+ type.toString().toLowerCase()
+											.replace('_', ' '));
 							delete.addActionListener(new ActionListener() {
 								@Override
 								public void actionPerformed(ActionEvent arg0) {
 									map.remove(selectedItem);
-									switch(type) {
+									switch (type) {
 									case GLOBAL_VARIABLE:
-										script.mainClass.globalVariables.remove(element);
+										script.mainClass.globalVariables
+												.remove(element);
 										break;
 									case METHOD:
-										script.mainClass.methods.remove(element);
+										script.mainClass.methods
+												.remove(element);
 										break;
 									case STATEMENT:
-										script.mainClass.methods.get(script.mainClass.methods.indexOf(map.get(selectedItem.getParent()))).statements.remove((SigmaStatement) element);
-										break;									
+										script.mainClass.methods.get(script.mainClass.methods
+												.indexOf(map.get(selectedItem
+														.getParent()))).statements
+												.remove((SigmaStatement) element);
+										break;
 									default:
-										System.err.println("Couldn't assume type.");
+										System.err
+												.println("Couldn't assume type.");
 									}
 									updateInterface();
 								}
 							});
 							menu.add(delete);
 						}
-						menu.show(tree, pathBounds.x, pathBounds.y + pathBounds.height);
+						menu.show(tree, pathBounds.x, pathBounds.y
+								+ pathBounds.height);
 					}
 				}
 			}
@@ -272,11 +364,11 @@ public class MainWindow implements TreeSelectionListener {
 		tree.addTreeSelectionListener(this);
 		model = (DefaultTreeModel) tree.getModel();
 		frame.getContentPane().add(tree);
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		JMenu file = new JMenu("File");
 		menuBar.add(file);
-		
+
 		JMenuItem newItem = new JMenuItem("New...");
 		newItem.addActionListener(new ActionListener() {
 			@Override
@@ -285,7 +377,7 @@ public class MainWindow implements TreeSelectionListener {
 			}
 		});
 		file.add(newItem);
-		
+
 		JMenuItem printToConsoleItem = new JMenuItem("Dump source to console");
 		printToConsoleItem.addActionListener(new ActionListener() {
 			@Override
@@ -293,79 +385,91 @@ public class MainWindow implements TreeSelectionListener {
 				System.out.println(script.getSource());
 			}
 		});
-		
+
 		JMenuItem mntmSaveSourceAs = new JMenuItem("Save source as...");
 		mntmSaveSourceAs.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fc = new JFileChooser();
-				fc.setFileFilter(new FileNameExtensionFilter("Java source files", "java"));
-				JOptionPane.showMessageDialog(frame, "The main class in your program is titled \"" + script.mainClass.name + "\".\nFor your program to compile correctly, you must save your file with that name.\nTo compile your program, run \"javac filename.java\" from the command line.\n(Note: you must have the JDK installed to compile Java programs. If you are running Windows, you must also set your PATH environment variable to include \"javac.exe\".)\nTo run your program, run \"java -cp . filename\"\n(Note: You must have the JRE or JDK installed to run Java programs. Also note that you do not type any file extension while running.)");
+				fc.setFileFilter(new FileNameExtensionFilter(
+						"Java source files", "java"));
+				JOptionPane
+						.showMessageDialog(
+								frame,
+								"The main class in your program is titled \""
+										+ script.mainClass.name
+										+ "\".\nFor your program to compile correctly, you must save your file with that name.\nTo compile your program, run \"javac filename.java\" from the command line.\n(Note: you must have the JDK installed to compile Java programs. If you are running Windows, you must also set your PATH environment variable to include \"javac.exe\".)\nTo run your program, run \"java -cp . filename\"\n(Note: You must have the JRE or JDK installed to run Java programs. Also note that you do not type any file extension while running.)");
 				int response = fc.showOpenDialog(frame);
-				if(response == JFileChooser.APPROVE_OPTION) {
+				if (response == JFileChooser.APPROVE_OPTION) {
 					File file = new File(fc.getSelectedFile().getAbsolutePath());
 					PrintWriter writer;
 					try {
 						writer = new PrintWriter(file);
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
-						JOptionPane.showMessageDialog(frame, "There was an error saving the file.");
+						JOptionPane.showMessageDialog(frame,
+								"There was an error saving the file.");
 						return;
 					}
 					writer.println(script.getSource());
 					writer.close();
-					JOptionPane.showMessageDialog(frame, "Successfully saved file at " + fc.getSelectedFile().getAbsolutePath());
+					JOptionPane.showMessageDialog(frame,
+							"Successfully saved file at "
+									+ fc.getSelectedFile().getAbsolutePath());
 				}
 			}
 		});
 		file.add(mntmSaveSourceAs);
 		file.add(printToConsoleItem);
-		
+
 		frame.setJMenuBar(menuBar);
-		
+
 		updateInterface();
 	}
 
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-		
-		if(node == null) {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
+				.getLastSelectedPathComponent();
+
+		if (node == null) {
 			return;
 		}
-		
+
 		System.out.println(node);
 	}
-	
+
 	public static void updateInterface() {
 		top.removeAllChildren();
 		map.clear();
-		
+
 		map.put(top, script);
-		
-		for(SigmaGlobalVariable gv : script.mainClass.globalVariables) {
+
+		for (SigmaGlobalVariable gv : script.mainClass.globalVariables) {
 			DefaultMutableTreeNode n = new DefaultMutableTreeNode(gv.name);
 			top.add(n);
 			map.put(n, gv);
 		}
-		
-		for(SigmaMethod m : script.mainClass.methods) {
+
+		for (SigmaMethod m : script.mainClass.methods) {
 			DefaultMutableTreeNode methodNode = updateMethod(m);
 			top.add(methodNode);
 			map.put(methodNode, m);
 		}
-		
+
 		model.reload();
 	}
-	
+
 	public static DefaultMutableTreeNode updateMethod(SigmaMethod m) {
-		String signature = (m.access == SigmaAccessModifier.NONE) ? "" : (m.access.toString().toLowerCase() + " ")
-				+ ((m.isStatic) ? "static " : "") + m.returnType + " " + m.name + "(";
+		String signature = (m.access == SigmaAccessModifier.NONE) ? ""
+				: (m.access.toString().toLowerCase() + " ")
+						+ ((m.isStatic) ? "static " : "") + m.returnType + " "
+						+ m.name + "(";
 		{
 			int i = 0;
 			int size = m.parameters.size();
-			for(String type : m.parameters.values()) {
-				if(i == size - 1) {
+			for (String type : m.parameters.values()) {
+				if (i == size - 1) {
 					signature += type;
 				} else {
 					signature += type + ", ";
@@ -374,35 +478,44 @@ public class MainWindow implements TreeSelectionListener {
 			}
 		}
 		signature += ")";
-		DefaultMutableTreeNode methodNode = new DefaultMutableTreeNode(signature);
-		
-		for(SigmaStatement s : m.statements) {
+		DefaultMutableTreeNode methodNode = new DefaultMutableTreeNode(
+				signature);
+
+		for (SigmaStatement s : m.statements) {
 			updateStatement(s, methodNode);
 		}
-		
+
 		return methodNode;
 	}
-	
-	public static void updateStatement(SigmaStatement s, DefaultMutableTreeNode parent) {
+
+	public static void updateStatement(SigmaStatement s,
+			DefaultMutableTreeNode parent) {
 		DefaultMutableTreeNode n = parent;
-		if(s instanceof SigmaAssignment) {
-			DefaultMutableTreeNode statement = new DefaultMutableTreeNode(((SigmaAssignment) s).object + 
-					" equals " + ((SigmaAssignment) s).dataToAssign);
+		if (s instanceof SigmaAssignment) {
+			DefaultMutableTreeNode statement = new DefaultMutableTreeNode(
+					((SigmaAssignment) s).object + " -> "
+							+ ((SigmaAssignment) s).dataToAssign);
 			n.add(statement);
 			map.put(statement, (SigmaAssignment) s);
-		} else if(s instanceof SigmaObject) {
-			DefaultMutableTreeNode statement = new DefaultMutableTreeNode("New: " + ((SigmaObject) s).name + " equals " + ((SigmaObject) s).data);
+		} else if (s instanceof SigmaObject) {
+			DefaultMutableTreeNode statement = new DefaultMutableTreeNode(
+					"New: " + ((SigmaObject) s).name + " -> "
+							+ ((SigmaObject) s).data);
 			n.add(statement);
 			map.put(statement, (SigmaElement) s);
-		} else if(s instanceof SigmaIfElseStatement) {
-			DefaultMutableTreeNode statement = new DefaultMutableTreeNode("If " + ((SigmaIfElseStatement) s).condition.split(" == ")[0] + 
-					" is " + ((SigmaIfElseStatement) s).condition.split(" == ")[1]);
-			DefaultMutableTreeNode thenBlock = new DefaultMutableTreeNode("Then");
-			for(SigmaStatement st : ((SigmaIfElseStatement) s).ifTrue.statements) {
+		} else if (s instanceof SigmaIfElseStatement) {
+			DefaultMutableTreeNode statement = new DefaultMutableTreeNode("If "
+					+ ((SigmaIfElseStatement) s).condition.split(" == ")[0]
+					+ " is "
+					+ ((SigmaIfElseStatement) s).condition.split(" == ")[1]);
+			DefaultMutableTreeNode thenBlock = new DefaultMutableTreeNode(
+					"Then");
+			for (SigmaStatement st : ((SigmaIfElseStatement) s).ifTrue.statements) {
 				updateStatement(st, thenBlock);
 			}
-			DefaultMutableTreeNode elseBlock = new DefaultMutableTreeNode("Else");
-			for(SigmaStatement st : ((SigmaIfElseStatement) s).ifFalse.statements) {
+			DefaultMutableTreeNode elseBlock = new DefaultMutableTreeNode(
+					"Else");
+			for (SigmaStatement st : ((SigmaIfElseStatement) s).ifFalse.statements) {
 				updateStatement(st, elseBlock);
 			}
 			map.put(thenBlock, ((SigmaIfElseStatement) s).ifTrue);
@@ -411,7 +524,8 @@ public class MainWindow implements TreeSelectionListener {
 			statement.add(elseBlock);
 			n.add(statement);
 		} else {
-			DefaultMutableTreeNode statement = new DefaultMutableTreeNode(s.toString());
+			DefaultMutableTreeNode statement = new DefaultMutableTreeNode(
+					s.toString());
 			n.add(statement);
 			map.put(statement, (SigmaElement) s);
 		}
