@@ -47,7 +47,7 @@ import java.awt.Font;
 
 public class MainWindow implements TreeSelectionListener {
 
-	private static JFrame frame;
+	private static JFrame frmSigma;
 	protected static JTree tree;
 	protected static DefaultTreeModel model;
 	protected static DefaultMutableTreeNode top;
@@ -65,11 +65,12 @@ public class MainWindow implements TreeSelectionListener {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+        System.setProperty("apple.awt.application.name", "Sigma");
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					MainWindow window = new MainWindow();
-					window.frame.setVisible(true);
+					frmSigma.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -88,11 +89,12 @@ public class MainWindow implements TreeSelectionListener {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 800, 600);
-		frame.setResizable(false);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		frmSigma = new JFrame();
+		frmSigma.setTitle("Sigma");
+		frmSigma.setBounds(100, 100, 800, 600);
+		frmSigma.setResizable(false);
+		frmSigma.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmSigma.getContentPane().setLayout(null);
 
 		top = new DefaultMutableTreeNode("Program");
 		tree = new JTree(top);
@@ -361,7 +363,7 @@ public class MainWindow implements TreeSelectionListener {
 		});
 		tree.addTreeSelectionListener(this);
 		model = (DefaultTreeModel) tree.getModel();
-		frame.getContentPane().add(tree);
+		frmSigma.getContentPane().add(tree);
 
 		JMenuBar menuBar = new JMenuBar();
 		JMenu file = new JMenu("File");
@@ -393,11 +395,11 @@ public class MainWindow implements TreeSelectionListener {
 						"Java source files", "java"));
 				JOptionPane
 						.showMessageDialog(
-								frame,
+								frmSigma,
 								"The main class in your program is titled \""
 										+ script.mainClass.name
 										+ "\".\nFor your program to compile correctly, you must save your file with that name.\nTo compile your program, run \"javac filename.java\" from the command line.\n(Note: you must have the JDK installed to compile Java programs. If you are running Windows, you must also set your PATH environment variable to include \"javac.exe\".)\nTo run your program, run \"java -cp . filename\"\n(Note: You must have the JRE or JDK installed to run Java programs. Also note that you do not type any file extension while running.)");
-				int response = fc.showOpenDialog(frame);
+				int response = fc.showOpenDialog(frmSigma);
 				if (response == JFileChooser.APPROVE_OPTION) {
 					File file = new File(fc.getSelectedFile().getAbsolutePath());
 					PrintWriter writer;
@@ -405,13 +407,13 @@ public class MainWindow implements TreeSelectionListener {
 						writer = new PrintWriter(file);
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
-						JOptionPane.showMessageDialog(frame,
+						JOptionPane.showMessageDialog(frmSigma,
 								"There was an error saving the file.");
 						return;
 					}
 					writer.println(script.getSource());
 					writer.close();
-					JOptionPane.showMessageDialog(frame,
+					JOptionPane.showMessageDialog(frmSigma,
 							"Successfully saved file at "
 									+ fc.getSelectedFile().getAbsolutePath());
 				}
@@ -420,7 +422,7 @@ public class MainWindow implements TreeSelectionListener {
 		file.add(mntmSaveSourceAs);
 		file.add(printToConsoleItem);
 
-		frame.setJMenuBar(menuBar);
+		frmSigma.setJMenuBar(menuBar);
 
 		updateInterface();
 	}
