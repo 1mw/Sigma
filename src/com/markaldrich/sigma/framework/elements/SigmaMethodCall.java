@@ -26,7 +26,7 @@ public class SigmaMethodCall implements SigmaElement, SigmaStatement {
 			}
 		}
 		
-		toReturn += ");";
+		toReturn += ");\n";
 		
 		return toReturn;
 	}

@@ -38,7 +38,7 @@ public class SigmaMethod implements SigmaElement {
 			}
 		}
 		
-		toReturn += ") {";
+		toReturn += ") {\n";
 		
 		for(SigmaStatement s : statements) {
 			if(s instanceof SigmaObject) {
@@ -48,7 +48,7 @@ public class SigmaMethod implements SigmaElement {
 			}
 		}
 		
-		toReturn += "}";
+		toReturn += "}\n";
 		
 		return toReturn;
 	}

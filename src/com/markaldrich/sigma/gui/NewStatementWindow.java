@@ -23,10 +23,11 @@ import com.markaldrich.sigma.framework.elements.SigmaMethodCall;
 import com.markaldrich.sigma.framework.elements.SigmaObject;
 import com.markaldrich.sigma.framework.elements.SigmaReturnStatement;
 import com.markaldrich.sigma.framework.elements.SigmaStatement;
+import java.awt.Toolkit;
 
 public class NewStatementWindow {
 
-	private JFrame frame;
+	private JFrame frmNewStatement;
 	public SigmaMethod methodToAddTo;
 	public boolean isMethod;
 	public SigmaElement ifElseToAddTo;
@@ -54,14 +55,14 @@ public class NewStatementWindow {
 		this.index = index;
 		isMethod = true;
 		initialize();
-		frame.setVisible(true);
+		frmNewStatement.setVisible(true);
 	}
 	
 	public NewStatementWindow(SigmaMethod methodToAddTo) {
 		this.methodToAddTo = methodToAddTo;
 		isMethod = true;
 		initialize();
-		frame.setVisible(true);
+		frmNewStatement.setVisible(true);
 	}
 	
 	public NewStatementWindow(SigmaElement ifElseToAddTo, int index, SigmaMethod parent) {
@@ -70,7 +71,7 @@ public class NewStatementWindow {
 		isMethod = false;
 		ifElseToAddToParent = parent;
 		initialize();
-		frame.setVisible(true);
+		frmNewStatement.setVisible(true);
 	}
 	
 	public NewStatementWindow(SigmaElement ifElseToAddTo, SigmaMethod parent) {
@@ -78,20 +79,22 @@ public class NewStatementWindow {
 		isMethod = false;
 		ifElseToAddToParent = parent;
 		initialize();
-		frame.setVisible(true);
+		frmNewStatement.setVisible(true);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setResizable(false);
-		frame.setBounds(100, 100, 450, 319);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frmNewStatement = new JFrame();
+		frmNewStatement.setIconImage(Toolkit.getDefaultToolkit().getImage(NewStatementWindow.class.getResource("/res/logo.png")));
+		frmNewStatement.setTitle("New Statement");
+		frmNewStatement.setResizable(false);
+		frmNewStatement.setBounds(100, 100, 450, 319);
+		frmNewStatement.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
+		frmNewStatement.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		
 		JPanel variablePanel = new JPanel();
 		tabbedPane.addTab("Variable", null, variablePanel, null);
@@ -122,7 +125,7 @@ public class NewStatementWindow {
 		JButton btnNewButton_1 = new JButton("Cancel");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
+				frmNewStatement.dispose();
 			}
 		});
 		btnNewButton_1.setBounds(219, 205, 98, 26);
@@ -232,7 +235,7 @@ public class NewStatementWindow {
 						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 					}
 				}
-				frame.dispose();
+				frmNewStatement.dispose();
 				MainWindow.updateInterface();
 			}
 		});
@@ -242,7 +245,7 @@ public class NewStatementWindow {
 		JButton btnCancel_3 = new JButton("Cancel");
 		btnCancel_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
+				frmNewStatement.dispose();
 			}
 		});
 		btnCancel_3.setBounds(219, 205, 98, 26);
@@ -358,7 +361,7 @@ public class NewStatementWindow {
 						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 					}
 				}
-				frame.dispose();
+				frmNewStatement.dispose();
 				MainWindow.updateInterface();
 			}
 		});
@@ -368,7 +371,7 @@ public class NewStatementWindow {
 		JButton btnCancel_2 = new JButton("Cancel");
 		btnCancel_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
+				frmNewStatement.dispose();
 			}
 		});
 		btnCancel_2.setBounds(219, 205, 98, 26);
@@ -399,7 +402,7 @@ public class NewStatementWindow {
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
+				frmNewStatement.dispose();
 			}
 		});
 		btnCancel.setBounds(219, 205, 98, 26);
@@ -499,7 +502,7 @@ public class NewStatementWindow {
 						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 					}
 				}
-				frame.dispose();
+				frmNewStatement.dispose();
 				MainWindow.updateInterface();
 			}
 		});
@@ -509,7 +512,7 @@ public class NewStatementWindow {
 		JButton btnCancel_1 = new JButton("Cancel");
 		btnCancel_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
+				frmNewStatement.dispose();
 			}
 		});
 		btnCancel_1.setBounds(219, 205, 98, 26);
@@ -603,7 +606,7 @@ public class NewStatementWindow {
 						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 					}
 				}
-				frame.dispose();
+				frmNewStatement.dispose();
 				MainWindow.updateInterface();
 			}
 		});
@@ -695,12 +698,16 @@ public class NewStatementWindow {
 						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 					}
 				}
-				frame.dispose();
+				frmNewStatement.dispose();
 				MainWindow.updateInterface();
 			}
 		});
 		btnNewButton.setBounds(329, 205, 98, 26);
 		variablePanel.add(btnNewButton);
+		
+		JLabel lblType = new JLabel("Type:");
+		lblType.setBounds(12, 67, 46, 14);
+		variablePanel.add(lblType);
 		
 		JPanel consolePrintPanel = new JPanel();
 		tabbedPane.addTab("Print to console", null, consolePrintPanel, null);
@@ -798,7 +805,7 @@ public class NewStatementWindow {
 						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 					}
 				}
-				frame.dispose();
+				frmNewStatement.dispose();
 				MainWindow.updateInterface();
 			}
 		});
@@ -808,7 +815,7 @@ public class NewStatementWindow {
 		JButton btnCancel_4 = new JButton("Cancel");
 		btnCancel_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				frame.dispose();
+				frmNewStatement.dispose();
 			}
 		});
 		btnCancel_4.setBounds(219, 205, 98, 26);

@@ -43,14 +43,18 @@ import com.markaldrich.sigma.framework.elements.SigmaMethod;
 import com.markaldrich.sigma.framework.elements.SigmaObject;
 import com.markaldrich.sigma.framework.elements.SigmaScript;
 import com.markaldrich.sigma.framework.elements.SigmaStatement;
+import javax.swing.JLabel;
+import javax.swing.JTextPane;
 
 
 public class MainWindow implements TreeSelectionListener {
 
-	private static JFrame frame;
+	private static JFrame frmSigma;
 	protected static JTree tree;
 	protected static DefaultTreeModel model;
 	protected static DefaultMutableTreeNode top;
+	private static JTextPane selectedItemPane;
+	private static JTextPane sourcePane;
 	private static HashMap<DefaultMutableTreeNode, SigmaElement> map = new HashMap<>();
 	
 	public static SigmaScript script = new SigmaScript();
@@ -69,7 +73,7 @@ public class MainWindow implements TreeSelectionListener {
 			public void run() {
 				try {
 					MainWindow window = new MainWindow();
-					window.frame.setVisible(true);
+					window.frmSigma.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -88,11 +92,13 @@ public class MainWindow implements TreeSelectionListener {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 800, 600);
-		frame.setResizable(false);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		frmSigma = new JFrame();
+		frmSigma.setIconImage(Toolkit.getDefaultToolkit().getImage(MainWindow.class.getResource("/res/logo.png")));
+		frmSigma.setTitle("Sigma");
+		frmSigma.setBounds(100, 100, 800, 600);
+		frmSigma.setResizable(false);
+		frmSigma.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmSigma.getContentPane().setLayout(null);
 		
 		top = new DefaultMutableTreeNode("Program");
 		tree = new JTree(top);
@@ -271,7 +277,24 @@ public class MainWindow implements TreeSelectionListener {
 		});
 		tree.addTreeSelectionListener(this);
 		model = (DefaultTreeModel) tree.getModel();
-		frame.getContentPane().add(tree);
+		frmSigma.getContentPane().add(tree);
+		
+		selectedItemPane = new JTextPane();
+		selectedItemPane.setEditable(false);
+		selectedItemPane.setBounds(401, 26, 383, 276);
+		frmSigma.getContentPane().add(selectedItemPane);
+		
+		JLabel lblInfo = new JLabel("Information");
+		lblInfo.setBounds(401, 1, 383, 14);
+		frmSigma.getContentPane().add(lblInfo);
+		
+		JLabel lblSource = new JLabel("Source");
+		lblSource.setBounds(401, 313, 383, 14);
+		frmSigma.getContentPane().add(lblSource);
+		
+		sourcePane = new JTextPane();
+		sourcePane.setBounds(401, 338, 383, 201);
+		frmSigma.getContentPane().add(sourcePane);
 		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu file = new JMenu("File");
@@ -300,8 +323,8 @@ public class MainWindow implements TreeSelectionListener {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fc = new JFileChooser();
 				fc.setFileFilter(new FileNameExtensionFilter("Java source files", "java"));
-				JOptionPane.showMessageDialog(frame, "The main class in your program is titled \"" + script.mainClass.name + "\".\nFor your program to compile correctly, you must save your file with that name.\nTo compile your program, run \"javac filename.java\" from the command line.\n(Note: you must have the JDK installed to compile Java programs. If you are running Windows, you must also set your PATH environment variable to include \"javac.exe\".)\nTo run your program, run \"java -cp . filename\"\n(Note: You must have the JRE or JDK installed to run Java programs. Also note that you do not type any file extension while running.)");
-				int response = fc.showOpenDialog(frame);
+				JOptionPane.showMessageDialog(frmSigma, "The main class in your program is titled \"" + script.mainClass.name + "\".\nFor your program to compile correctly, you must save your file with that name.\nTo compile your program, run \"javac filename.java\" from the command line.\n(Note: you must have the JDK installed to compile Java programs. If you are running Windows, you must also set your PATH environment variable to include \"javac.exe\".)\nTo run your program, run \"java -cp . filename\"\n(Note: You must have the JRE or JDK installed to run Java programs. Also note that you do not type any file extension while running.)");
+				int response = fc.showOpenDialog(frmSigma);
 				if(response == JFileChooser.APPROVE_OPTION) {
 					File file = new File(fc.getSelectedFile().getAbsolutePath());
 					PrintWriter writer;
@@ -309,19 +332,27 @@ public class MainWindow implements TreeSelectionListener {
 						writer = new PrintWriter(file);
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
-						JOptionPane.showMessageDialog(frame, "There was an error saving the file.");
+						JOptionPane.showMessageDialog(frmSigma, "There was an error saving the file.");
 						return;
 					}
 					writer.println(script.getSource());
 					writer.close();
-					JOptionPane.showMessageDialog(frame, "Successfully saved file at " + fc.getSelectedFile().getAbsolutePath());
+					JOptionPane.showMessageDialog(frmSigma, "Successfully saved file at " + fc.getSelectedFile().getAbsolutePath());
 				}
 			}
 		});
 		file.add(mntmSaveSourceAs);
+		
+		JMenuItem mntmShowSource = new JMenuItem("Show source");
+		mntmShowSource.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new ShowSourceWindow(script.getSource());
+			}
+		});
+		file.add(mntmShowSource);
 		file.add(printToConsoleItem);
 		
-		frame.setJMenuBar(menuBar);
+		frmSigma.setJMenuBar(menuBar);
 		
 		updateInterface();
 	}
@@ -335,6 +366,121 @@ public class MainWindow implements TreeSelectionListener {
 		}
 		
 		System.out.println(node);
+		
+
+		String s = "";
+		SigmaElement element = map.get(node);
+		
+		System.out.println(element);
+		System.out.println(element.getClass().getName());
+		
+		
+		final SigmaElementType type = (element instanceof SigmaGlobalVariable) ? SigmaElementType.GLOBAL_VARIABLE :
+			(element instanceof SigmaScript) ? SigmaElementType.SCRIPT : 
+				(element instanceof SigmaMethod) ? SigmaElementType.METHOD :  
+					(element instanceof SigmaIfElseStatement) ? SigmaElementType.IF_ELSE : 
+						(element instanceof SigmaIfBlock) ? SigmaElementType.IF : 
+							(element instanceof SigmaElseBlock) ? SigmaElementType.ELSE : 
+								(element instanceof SigmaObject) ? SigmaElementType.OBJECT :
+									(element instanceof SigmaStatement) ? SigmaElementType.STATEMENT : SigmaElementType.UNKNOWN;
+		
+		sourcePane.setText("");
+		
+		switch(type) {
+		case GLOBAL_VARIABLE:
+			s += "Global Variable";
+			SigmaGlobalVariable gv = (SigmaGlobalVariable) element;
+			s += " " + gv.name;
+			
+			sourcePane.setText(gv.declarationToString());
+			break;
+		case SCRIPT:
+			s += "Script";
+			SigmaScript sc = (SigmaScript) element;
+			
+			sourcePane.setText(sc.getSource());
+			break;
+		case METHOD:
+			s += "Method";
+			SigmaMethod m = (SigmaMethod) element;
+			s += " " + m.name;
+			
+			s += "\n";
+			
+			s += "Parameters:\n";
+			
+			for(String p : m.parameters.keySet()) {
+				s += "	Name = " + p + "; Type = " + m.parameters.get(p) + "\n";
+			}
+			
+			sourcePane.setText(m.toString());
+			break;
+		case IF_ELSE:
+			s += "If/Else Statement\n";
+			SigmaIfElseStatement ifs = (SigmaIfElseStatement) element;
+			s += "Condition: " + ifs.condition + "\n";
+			
+			
+			sourcePane.setText(ifs.toString());
+			break;
+		case IF:
+			s += "If Block";
+			SigmaIfBlock ib = (SigmaIfBlock) element;
+			
+			String source = "";
+			for(SigmaStatement ss : ib.statements) {
+				if(ss instanceof SigmaGlobalVariable) {
+					source += ((SigmaGlobalVariable) ss).declarationToString();
+				} else if(ss instanceof SigmaObject) {
+					source += ((SigmaObject) ss).declarationToString();
+				} else {
+					source += ss.toString();
+				}
+			}
+			
+			sourcePane.setText(source);
+			break;
+		case ELSE:
+			s += "Else Block";
+			SigmaElseBlock eb = (SigmaElseBlock) element;
+			
+			sourcePane.setText(eb.toString());
+			break;
+		case STATEMENT:
+			SigmaStatement st = (SigmaStatement) element;
+			if(st instanceof SigmaAssignment) {
+				SigmaAssignment sa = (SigmaAssignment) st;
+				s += "Assignment\n";
+				s += sa.object + " -> " + sa.dataToAssign;
+				
+				sourcePane.setText(sa.toString());
+			}
+			
+			// TODO: Add more types here
+			break;
+		case UNKNOWN:
+			throw new RuntimeException("Unknown type!");
+		case CLASS:
+			break;
+		case OBJECT:
+			s += "Variable";
+			SigmaObject o = (SigmaObject) element;
+			s += " " + o.name;
+			
+			s += "\n";
+			
+			s += "Name -> " + o.name + "\n";
+			s += "Type -> " + o.type + "\n";
+			s += "Data -> " + o.data + "\n";
+			
+			sourcePane.setText(o.declarationToString());
+			break;
+		default:
+			break;
+		}
+		
+		selectedItemPane.setText("");
+		selectedItemPane.setText(s);
 	}
 	
 	public static void updateInterface() {
@@ -356,6 +502,8 @@ public class MainWindow implements TreeSelectionListener {
 		}
 		
 		model.reload();
+		
+		expandAllNodes();
 	}
 	
 	public static DefaultMutableTreeNode updateMethod(SigmaMethod m) {
@@ -405,6 +553,7 @@ public class MainWindow implements TreeSelectionListener {
 			for(SigmaStatement st : ((SigmaIfElseStatement) s).ifFalse.statements) {
 				updateStatement(st, elseBlock);
 			}
+			map.put(statement, (SigmaIfElseStatement) s);
 			map.put(thenBlock, ((SigmaIfElseStatement) s).ifTrue);
 			map.put(elseBlock, ((SigmaIfElseStatement) s).ifFalse);
 			statement.add(thenBlock);
@@ -414,6 +563,17 @@ public class MainWindow implements TreeSelectionListener {
 			DefaultMutableTreeNode statement = new DefaultMutableTreeNode(s.toString());
 			n.add(statement);
 			map.put(statement, (SigmaElement) s);
+		}
+	}
+	
+	private static void expandAllNodes() {
+		int rc = tree.getRowCount();
+		for(int i = 0; i < rc; i++) {
+			tree.expandRow(i);
+		}
+		
+		if(tree.getRowCount() != rc) {
+			expandAllNodes();
 		}
 	}
 }

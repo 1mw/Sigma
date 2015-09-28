@@ -7,4 +7,9 @@ public class SigmaScript implements SigmaElement {
 		if(mainClass == null) System.err.println("Script has no main class!");
 		return mainClass.toString();
 	}
+	
+	@Override
+	public String toString() {
+		return getSource();
+	}
 }

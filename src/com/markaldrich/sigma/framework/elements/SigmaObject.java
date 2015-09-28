@@ -15,7 +15,7 @@ public class SigmaObject implements SigmaStatement, SigmaElement {
 		if(name == null) System.err.println("Object has null name!");
 		if(type == null) System.err.println("Object has null type!");
 		if(data == null) System.err.println("Object has null data!");
-		return ((isFinal == true) ? "final " : "") + type + " " + name + " = " + data + ";";
+		return ((isFinal == true) ? "final " : "") + type + " " + name + " = " + data + ";\n";
 	}
 	
 	@Override

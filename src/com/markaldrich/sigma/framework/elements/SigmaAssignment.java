@@ -11,6 +11,6 @@ public class SigmaAssignment implements SigmaElement, SigmaStatement {
 	
 	@Override
 	public String toString() {
-		return object + " = " + dataToAssign + ";";
+		return object + " = " + dataToAssign + ";\n";
 	}
 }

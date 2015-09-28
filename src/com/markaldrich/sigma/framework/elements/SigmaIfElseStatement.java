@@ -8,7 +8,7 @@ public class SigmaIfElseStatement implements SigmaStatement, SigmaElement {
 	
 	@Override
 	public String toString() {
-		String toReturn = "if(" + condition + ") {";
+		String toReturn = "if(" + condition + ") {\n";
 		
 		for(SigmaStatement s : ifTrue.statements) {
 			if(s instanceof SigmaObject) {
@@ -18,7 +18,7 @@ public class SigmaIfElseStatement implements SigmaStatement, SigmaElement {
 			}
 		}
 		
-		toReturn += "} else {";
+		toReturn += "} else {\n";
 		
 		for(SigmaStatement s : ifFalse.statements) {
 			if(s instanceof SigmaObject) {
@@ -28,7 +28,7 @@ public class SigmaIfElseStatement implements SigmaStatement, SigmaElement {
 			}
 		}
 		
-		toReturn += "}";
+		toReturn += "}\n";
 		
 		return toReturn;
 	}

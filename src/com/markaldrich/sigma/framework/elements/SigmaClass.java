@@ -21,10 +21,10 @@ public class SigmaClass implements SigmaElement {
 		if(access == null) System.err.println("Class has null access modifier!");
 		String toReturn = "";
 		for(String s : imports) {
-			toReturn += "import " + s + ";";
+			toReturn += "import " + s + ";\n";
 		}
 		toReturn += (access == SigmaAccessModifier.NONE) ? "" : (access.toString().toLowerCase() + " ");
-		toReturn += "class " + name + " {";
+		toReturn += "class " + name + " {\n";
 		
 		for(SigmaGlobalVariable g : globalVariables) {
 			toReturn += g.declarationToString();
@@ -34,7 +34,7 @@ public class SigmaClass implements SigmaElement {
 			toReturn += m.toString();
 		}
 		
-		toReturn += "}";
+		toReturn += "}\n";
 		
 		return toReturn;
 	}

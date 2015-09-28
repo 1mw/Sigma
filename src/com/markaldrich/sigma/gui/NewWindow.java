@@ -32,7 +32,7 @@ import javax.swing.event.DocumentListener;
 
 public class NewWindow {
 
-	private JFrame frame;
+	private JFrame frmNewClassLevel;
 
 	public static final String[] types = {
 		"Variable",
@@ -60,27 +60,29 @@ public class NewWindow {
 	 */
 	public NewWindow() {
 		initialize();
-		frame.setVisible(true);
+		frmNewClassLevel.setVisible(true);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		frame.requestFocus();
-		frame.setResizable(false);
-		frame.setAlwaysOnTop(true);
-		frame.getContentPane().setLayout(null);
+		frmNewClassLevel = new JFrame();
+		frmNewClassLevel.setIconImage(Toolkit.getDefaultToolkit().getImage(NewWindow.class.getResource("/res/logo.png")));
+		frmNewClassLevel.setTitle("New Class Level Item");
+		frmNewClassLevel.setBounds(100, 100, 450, 300);
+		frmNewClassLevel.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		frmNewClassLevel.requestFocus();
+		frmNewClassLevel.setResizable(false);
+		frmNewClassLevel.setAlwaysOnTop(true);
+		frmNewClassLevel.getContentPane().setLayout(null);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(0, 0, 444, 271);
 		
 		
 		
-		frame.getContentPane().add(tabbedPane);
+		frmNewClassLevel.getContentPane().add(tabbedPane);
 		
 		JPanel newMethod = new JPanel();
 		tabbedPane.addTab("Method", null, newMethod, null);
@@ -89,7 +91,7 @@ public class NewWindow {
 		JButton btnCancel_1 = new JButton("Cancel");
 		btnCancel_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
+				frmNewClassLevel.dispose();
 			}
 		});
 		btnCancel_1.setBounds(219, 205, 98, 26);
@@ -203,7 +205,7 @@ public class NewWindow {
 				
 				MainWindow.script.mainClass.globalVariables.add(g);
 				
-				frame.dispose();
+				frmNewClassLevel.dispose();
 				
 				MainWindow.updateInterface();
 			}
@@ -214,7 +216,7 @@ public class NewWindow {
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				frame.dispose();
+				frmNewClassLevel.dispose();
 			}
 		});
 		btnCancel.setBounds(219, 205, 98, 26);
@@ -261,7 +263,7 @@ public class NewWindow {
 					break;
 				}
 				MainWindow.script.mainClass.methods.add(m);
-				frame.dispose();
+				frmNewClassLevel.dispose();
 				
 				MainWindow.updateInterface();
 			}
@@ -309,7 +311,7 @@ public class NewWindow {
 					return;
 				}
 				MainWindow.script.mainClass.imports.add(importName.getText());
-				frame.dispose();
+				frmNewClassLevel.dispose();
 				MainWindow.updateInterface();
 			}
 		});
@@ -319,7 +321,7 @@ public class NewWindow {
 		JButton btnCancel_2 = new JButton("Cancel");
 		btnCancel_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
+				frmNewClassLevel.dispose();
 			}
 		});
 		btnCancel_2.setBounds(219, 205, 98, 26);
