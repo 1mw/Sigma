@@ -218,6 +218,7 @@ public class NewStatementWindow {
 							}
 						}
 						if(indexOfIfElseStatement == -1) {
+							// TODO: Check for if block or else block, not just method parent
 							System.err.println("indexOfIfElseStatement == -1");
 							return;
 						}
