@@ -18,12 +18,16 @@ import javax.swing.JTextPane;
 
 public class ShowSourceWindow extends JDialog implements ClipboardOwner {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5081814857929301168L;
 	private final JPanel contentPanel = new JPanel();
 
 	/**
 	 * Create the dialog.
 	 */
-	public ShowSourceWindow(String source) {
+	public ShowSourceWindow(final String source) {
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setLayout(new FlowLayout());

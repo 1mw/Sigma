@@ -3,7 +3,6 @@ package com.markaldrich.sigma.gui;
 import javax.swing.JFrame;
 import javax.swing.JComboBox;
 import javax.swing.WindowConstants;
-import javax.swing.JInternalFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -16,17 +15,14 @@ import java.awt.event.ActionEvent;
 import com.markaldrich.sigma.framework.elements.*;
 
 import javax.swing.JCheckBox;
-import javax.swing.JSeparator;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -110,12 +106,13 @@ public class NewWindow {
 		lblReturnType.setBounds(12, 40, 125, 16);
 		newMethod.add(lblReturnType);
 		
-		JComboBox comboReturn = new JComboBox(defaultTypes);
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		final JComboBox comboReturn = new JComboBox(defaultTypes);
 		comboReturn.setEditable(true);
 		comboReturn.setBounds(155, 40, 190, 20);
 		newMethod.add(comboReturn);
 		
-		JCheckBox checkStaticMethod = new JCheckBox("Static");
+		final JCheckBox checkStaticMethod = new JCheckBox("Static");
 		checkStaticMethod.setBounds(12, 68, 125, 24);
 		newMethod.add(checkStaticMethod);
 		
@@ -145,7 +142,7 @@ public class NewWindow {
 		lblType.setBounds(12, 70, 55, 16);
 		newGlobalVariable.add(lblType);
 		
-		JCheckBox checkStaticGlobal = new JCheckBox("Static");
+		final JCheckBox checkStaticGlobal = new JCheckBox("Static");
 		checkStaticGlobal.setBounds(201, 38, 112, 24);
 		newGlobalVariable.add(checkStaticGlobal);
 		
@@ -158,20 +155,24 @@ public class NewWindow {
 				i++;
 			}
 		}
-		JComboBox accessModifierBoxGlobal = new JComboBox(types);
+		
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		final JComboBox accessModifierBoxGlobal = new JComboBox(types);
 		accessModifierBoxGlobal.setBounds(205, 11, 222, 20);
 		newGlobalVariable.add(accessModifierBoxGlobal);
 		
-		JComboBox accessModifierBoxMethod = new JComboBox(types);
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		final JComboBox accessModifierBoxMethod = new JComboBox(types);
 		accessModifierBoxMethod.setBounds(155, 70, 190, 20);
 		newMethod.add(accessModifierBoxMethod);
 		
-		JComboBox comboType = new JComboBox(defaultTypes);
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		final JComboBox comboType = new JComboBox(defaultTypes);
 		comboType.setEditable(true);
 		comboType.setBounds(79, 70, 114, 20);
 		newGlobalVariable.add(comboType);
 
-		JCheckBox checkFinal = new JCheckBox("Final");
+		final JCheckBox checkFinal = new JCheckBox("Final");
 		checkFinal.setBounds(201, 66, 112, 24);
 		newGlobalVariable.add(checkFinal);
 

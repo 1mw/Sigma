@@ -73,7 +73,7 @@ public class MainWindow implements TreeSelectionListener {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainWindow window = new MainWindow();
+					new MainWindow();
 					frmSigma.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -112,14 +112,14 @@ public class MainWindow implements TreeSelectionListener {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (SwingUtilities.isRightMouseButton(e)) {
-					TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+					final TreePath path = tree.getPathForLocation(e.getX(), e.getY());
 					Rectangle pathBounds = tree.getUI().getPathBounds(tree,
 							path);
 					if (pathBounds != null
 							&& pathBounds.contains(e.getX(), e.getY())) {
-						DefaultMutableTreeNode selectedItem = (DefaultMutableTreeNode) path
+						final DefaultMutableTreeNode selectedItem = (DefaultMutableTreeNode) path
 								.getLastPathComponent();
-						SigmaElement element = map.get(selectedItem);
+						final SigmaElement element = map.get(selectedItem);
 						final SigmaElementType type = (element instanceof SigmaGlobalVariable) ? SigmaElementType.GLOBAL_VARIABLE
 								: (element instanceof SigmaScript) ? SigmaElementType.SCRIPT
 										: (element instanceof SigmaMethod) ? SigmaElementType.METHOD

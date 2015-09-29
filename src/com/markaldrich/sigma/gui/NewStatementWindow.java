@@ -108,7 +108,7 @@ public class NewStatementWindow {
 		lblValue_1.setBounds(12, 40, 55, 16);
 		variablePanel.add(lblValue_1);
 		
-		JCheckBox variableFinal = new JCheckBox("Final");
+		final JCheckBox variableFinal = new JCheckBox("Final");
 		variableFinal.setBounds(85, 96, 112, 24);
 		variablePanel.add(variableFinal);
 		
@@ -519,7 +519,8 @@ public class NewStatementWindow {
 		btnCancel_1.setBounds(219, 205, 98, 26);
 		returnPanel.add(btnCancel_1);
 
-		JComboBox variableType = new JComboBox(NewWindow.defaultTypes);
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		final JComboBox variableType = new JComboBox(NewWindow.defaultTypes);
 		variableType.setEditable(true);
 		variableType.setBounds(85, 68, 114, 20);
 		variablePanel.add(variableType);
