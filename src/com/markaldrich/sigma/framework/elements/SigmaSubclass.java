@@ -2,18 +2,12 @@ package com.markaldrich.sigma.framework.elements;
 
 import java.util.ArrayList;
 
-/**
- * SigmaClass is an abstraction of a Java class in a Sigma script.
- * @author maste
- *
- */
-public class SigmaClass implements SigmaElement {
-	
+public class SigmaSubclass implements SigmaElement {
 	public String name;
 	public SigmaAccessModifier access;
+	public boolean isStatic;
 	public ArrayList<SigmaGlobalVariable> globalVariables = new ArrayList<>();
 	public ArrayList<SigmaMethod> methods = new ArrayList<>();
-	public ArrayList<String> imports = new ArrayList<>();
 	public ArrayList<SigmaSubclass> subclasses = new ArrayList<>();
 	
 	@Override
@@ -21,10 +15,8 @@ public class SigmaClass implements SigmaElement {
 		if(name == null) System.err.println("Class has null name!");
 		if(access == null) System.err.println("Class has null access modifier!");
 		String toReturn = "";
-		for(String s : imports) {
-			toReturn += "import " + s + ";\n";
-		}
 		toReturn += (access == SigmaAccessModifier.NONE) ? "" : (access.toString().toLowerCase() + " ");
+		toReturn += (isStatic) ? "static " : "";
 		toReturn += "class " + name + " {\n";
 		
 		for(SigmaGlobalVariable g : globalVariables) {
