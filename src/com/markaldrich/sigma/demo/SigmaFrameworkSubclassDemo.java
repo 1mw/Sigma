@@ -14,9 +14,18 @@ public class SigmaFrameworkSubclassDemo {
 			mainMethod.name = "main";
 			mainMethod.access = SigmaAccessModifier.PUBLIC;
 			mainMethod.isStatic = true;
+			mainMethod.parameters.put("args", "String[]");
 			mainMethod.returnType = "void";
 			{
+				SigmaObject instance = new SigmaObject();
+				instance.data = "new Subclass()";
+				instance.name = "sub";
+				instance.type = "Subclass";
+				mainMethod.statements.add(instance);
 				
+				SigmaMethodCall callPrint = new SigmaMethodCall();
+				callPrint.method = "sub.print";
+				mainMethod.statements.add(callPrint);
 			}
 			mainClass.methods.add(mainMethod);
 			
@@ -25,7 +34,19 @@ public class SigmaFrameworkSubclassDemo {
 			subclass.isStatic = true;
 			subclass.name = "Subclass";
 			{
-				
+				SigmaMethod test = new SigmaMethod();
+				test.name = "print";
+				test.access = SigmaAccessModifier.PUBLIC;
+				test.returnType = "void";
+				{
+					SigmaMethodCall print = new SigmaMethodCall();
+					print.method = "System.out.println";
+					{
+						print.parameters.add("\"Hello world!\"");
+					}
+					test.statements.add(print);
+				}
+				subclass.methods.add(test);
 			}
 			mainClass.subclasses.add(subclass);
 		}
