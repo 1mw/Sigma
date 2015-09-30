@@ -31,10 +31,17 @@ public class SigmaFrameworkControlFlowDemo {
 					{
 						SigmaIfBlock ifBlock = new SigmaIfBlock();
 						{
+						    SigmaObject object = new SigmaObject();
+						    object.data = "2";
+						    object.name = "dag";
+						    object.type = "int";
+						    ifBlock.statements.add(object);
+						    
+						    
 							SigmaMethodCall print = new SigmaMethodCall();
 							print.method = "System.out.println";
 							print.parameters.add("\"The number is even!\"");
-							isNumberEven.ifTrue.statements.add(print);
+							ifBlock.statements.add(print);
 						}
 						isNumberEven.ifTrue = ifBlock;
 						
@@ -43,7 +50,7 @@ public class SigmaFrameworkControlFlowDemo {
 							SigmaMethodCall print = new SigmaMethodCall();
 							print.method = "System.out.println";
 							print.parameters.add("\"The number is odd!\"");
-							isNumberEven.ifFalse.statements.add(print);
+							ifFalse.statements.add(print);
 						}
 						isNumberEven.ifFalse = ifFalse;
 					}

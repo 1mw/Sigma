@@ -6,7 +6,9 @@ import javax.swing.WindowConstants;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
@@ -311,7 +313,17 @@ public class NewWindow {
 					Toolkit.getDefaultToolkit().beep();
 					return;
 				}
-				MainWindow.script.mainClass.imports.add(importName.getText());
+				for(SigmaImport im : MainWindow.script.imports) {
+				    if(im.toImport.equals(importName.getText())) {
+					Toolkit.getDefaultToolkit().beep();
+					JOptionPane.showMessageDialog(importPanel, "Import already exists.", "Error", JOptionPane.WARNING_MESSAGE, new ImageIcon(Toolkit.getDefaultToolkit().getImage(MainWindow.class.getResource("/res/logo.png"))));
+					return;
+				    }
+				}
+				
+				SigmaImport i = new SigmaImport();
+				i.toImport = importName.getText();
+				MainWindow.script.imports.add(i);
 				frmNewClassLevel.dispose();
 				MainWindow.updateInterface();
 			}

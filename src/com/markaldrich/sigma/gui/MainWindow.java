@@ -361,6 +361,14 @@ public class MainWindow implements TreeSelectionListener {
 		}
 	    }
 	});
+	
+	JMenuItem mntmManageImports = new JMenuItem("Manage imports...");
+	mntmManageImports.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    new ImportsWindow();
+		}
+	});
+	file.add(mntmManageImports);
 	file.add(mntmSaveSourceAs);
 
 	JMenuItem mntmShowSource = new JMenuItem("Show source");
