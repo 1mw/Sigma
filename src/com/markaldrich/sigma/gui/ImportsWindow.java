@@ -5,7 +5,6 @@ import javax.swing.JTextArea;
 
 import com.markaldrich.sigma.framework.elements.SigmaImport;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -16,7 +15,6 @@ import java.awt.event.ActionListener;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
-import java.awt.Window.Type;
 
 public class ImportsWindow {
 
