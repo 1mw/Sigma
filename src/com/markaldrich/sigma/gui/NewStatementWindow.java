@@ -218,22 +218,24 @@ public class NewStatementWindow {
 							}
 						}
 						if(indexOfIfElseStatement == -1) {
+							// Check for if/else block now
 							// TODO: Check for if block or else block, not just method parent
 							System.err.println("indexOfIfElseStatement == -1");
-							return;
-						}
-						SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
-								MainWindow.script.mainClass.methods.get(indexOfMethod)
-								.statements.get(indexOfIfElseStatement);
-						
-						if(index == -1) {
-							elseBlock.statements.add(ss);
+							
 						} else {
-							elseBlock.statements.add(index, ss);
+							SigmaIfElseStatement ifElseTemp = (SigmaIfElseStatement) 
+									MainWindow.script.mainClass.methods.get(indexOfMethod)
+									.statements.get(indexOfIfElseStatement);
+							
+							if(index == -1) {
+								elseBlock.statements.add(ss);
+							} else {
+								elseBlock.statements.add(index, ss);
+							}
+							ifElseTemp.ifFalse = elseBlock;
+							temp.statements.set(indexOfIfElseStatement, ifElseTemp);
+							MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 						}
-						ifElseTemp.ifFalse = elseBlock;
-						temp.statements.set(indexOfIfElseStatement, ifElseTemp);
-						MainWindow.script.mainClass.methods.set(indexOfMethod, temp);
 					}
 				}
 				frmNewStatement.dispose();
