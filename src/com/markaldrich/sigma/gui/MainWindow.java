@@ -536,7 +536,18 @@ public class MainWindow implements TreeSelectionListener {
 			s += "Else Block";
 			SigmaElseBlock eb = (SigmaElseBlock) element;
 
-			sourcePane.setText(eb.toString());
+			String source2 = "";
+			for(SigmaStatement ss : eb.statements) {
+				if(ss instanceof SigmaGlobalVariable) {
+					source2 += ((SigmaGlobalVariable) ss).declarationToString();
+				} else if(ss instanceof SigmaObject) {
+					source2 += ((SigmaObject) ss).declarationToString();
+				} else {
+					source2 += ss.toString();
+				}
+			}
+			
+			sourcePane.setText(source2);
 			break;
 		case STATEMENT:
 			SigmaStatement st = (SigmaStatement) element;
