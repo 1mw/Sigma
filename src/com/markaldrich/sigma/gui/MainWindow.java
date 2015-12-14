@@ -582,12 +582,12 @@ public class MainWindow implements TreeSelectionListener {
 		DefaultMutableTreeNode n = parent;
 		if(s instanceof SigmaAssignment) {
 			DefaultMutableTreeNode statement = new DefaultMutableTreeNode(
-					((SigmaAssignment) s).object + " → " + ((SigmaAssignment) s).dataToAssign);
+					((SigmaAssignment) s).object + " -> " + ((SigmaAssignment) s).dataToAssign);
 			n.add(statement);
 			map.put(statement, (SigmaAssignment) s);
 		} else if(s instanceof SigmaObject) {
 			DefaultMutableTreeNode statement = new DefaultMutableTreeNode(
-					"New: " + ((SigmaObject) s).name + " → " + ((SigmaObject) s).data);
+					"New: " + ((SigmaObject) s).name + " -> " + ((SigmaObject) s).data);
 			n.add(statement);
 			map.put(statement, (SigmaElement) s);
 		} else if(s instanceof SigmaIfElseStatement) {
