@@ -644,8 +644,8 @@ public class MainWindow implements TreeSelectionListener {
 	 * @return The DefaultMutableTreeNode that represents m.
 	 */
 	public static DefaultMutableTreeNode updateMethod(SigmaMethod m) {
-		String signature = (m.access == SigmaAccessModifier.NONE) ? ""
-				: (m.access.toString().toLowerCase() + " ") + ((m.isStatic) ? "static " : "") + m.returnType + " "
+		String signature = ((m.access == SigmaAccessModifier.NONE) ? ""
+				: (m.access.toString().toLowerCase() + " ")) + ((m.isStatic) ? "static " : "") + m.returnType + " "
 						+ m.name + "(";
 		{
 			int i = 0;
