@@ -49,17 +49,60 @@ import com.markaldrich.sigma.framework.elements.SigmaScript;
 import com.markaldrich.sigma.framework.elements.SigmaStatement;
 
 public class MainWindow implements TreeSelectionListener {
-
+	/**
+	 * The JFrame that is the main window.
+	 */
 	private static JFrame frmSigma;
+	
+	/**
+	 * The tree that holds the program structure.
+	 */
 	protected static JTree tree;
+	
+	/**
+	 * The model for the tree.
+	 */
 	protected static DefaultTreeModel model;
+	
+	/**
+	 * The top of the tree. Should be the "Program" node.
+	 */
 	protected static DefaultMutableTreeNode top;
+	
+	/**
+	 * The JTextPane that holds info about the currently
+	 * selected node. This should be updated whenever the
+	 * user clicks something. It is updated in this class.
+	 */
 	private static JTextPane selectedItemPane;
+	
+	/**
+	 * The JTextPane that shows the source for the currently
+	 * selected objects. This should be updated whenever the
+	 * user clicks something. It is updated in this class,
+	 * but the source is generated from the 
+	 * com.markaldrich.sigma.framework.elements.* objects.
+	 */
 	private static JTextPane sourcePane;
+	
+	/**
+	 * The HashMap that maps each node to its SigmaElement counterpart.
+	 */
 	private static HashMap<DefaultMutableTreeNode, SigmaElement> map = new HashMap<>();
 
+	/**
+	 * The SigmaScript that represents the program that the 
+	 * user is currently working on. Currently, this program
+	 * is generated before the window even appears and you
+	 * cannot save it and or load it later.
+	 */
 	public static SigmaScript script = new SigmaScript();
 
+	/**
+	 * More static initialization of the SigmaScript,
+	 * as you must manually initialize these things after
+	 * creating the SigmaScript.
+	 */
 	static {
 		SigmaClass main = new SigmaClass();
 		main.name = "Main";
@@ -102,7 +145,8 @@ public class MainWindow implements TreeSelectionListener {
 		frmSigma.setResizable(false);
 		frmSigma.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmSigma.getContentPane().setLayout(null);
-
+		
+		// Initialization
 		top = new DefaultMutableTreeNode("Program");
 		tree = new JTree(top);
 		tree.setFont(new Font("Lucida Console", Font.PLAIN, 11));
@@ -112,6 +156,7 @@ public class MainWindow implements TreeSelectionListener {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if(SwingUtilities.isRightMouseButton(e)) {
+					// Try to find the element that the user clicked on
 					final TreePath path = tree.getPathForLocation(e.getX(), e.getY());
 					Rectangle pathBounds = tree.getUI().getPathBounds(tree, path);
 					if(pathBounds != null && pathBounds.contains(e.getX(), e.getY())) {
@@ -131,7 +176,14 @@ public class MainWindow implements TreeSelectionListener {
 																				: SigmaElementType.UNKNOWN;
 
 						System.out.println();
+						
+						// This is the menu that will pop up
+						// after right clicking on an element.
 						JPopupMenu menu = new JPopupMenu();
+						
+						// Determine the appropriate menu items
+						// to show according to the type of element
+						// clicked on.
 						if(type == SigmaElementType.METHOD) {
 							JMenuItem addStatement = new JMenuItem("Add statement");
 							addStatement.addActionListener(new ActionListener() {
@@ -320,7 +372,7 @@ public class MainWindow implements TreeSelectionListener {
 		spScroll.setBounds(sourcePane.getBounds());
 		frmSigma.getContentPane().add(spScroll);
 		
-		
+		// The menu bar at the top of the window
 		JMenuBar menuBar = new JMenuBar();
 		JMenu file = new JMenu("File");
 		menuBar.add(file);
@@ -393,6 +445,9 @@ public class MainWindow implements TreeSelectionListener {
 		updateInterface();
 	}
 
+	/**
+	 * Updates the selectItemPane and sourcePane
+	 */
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
@@ -529,29 +584,65 @@ public class MainWindow implements TreeSelectionListener {
 		selectedItemPane.setText(s);
 	}
 
+	/**
+	 * Updates the tree interface.
+	 */
 	public static void updateInterface() {
+		// Clear the tree.
 		top.removeAllChildren();
+		
+		// Clear the bindings between the SigmaElements and
+		// the tree nodes.
 		map.clear();
 
+		// Map the "Program" node to the SigmaScript
+		// itself, which happens to be a SigmaElement,
+		// so it fits in this HashMap.
 		map.put(top, script);
 
+		// Add all of the global variables to the tree.
 		for(SigmaGlobalVariable gv : script.mainClass.globalVariables) {
+			// Construct the node, add it to the "Program"
+			// node, and map it to the SigmaGlobalVariable that
+			// it corresponds to.
 			DefaultMutableTreeNode n = new DefaultMutableTreeNode(gv.name);
 			top.add(n);
 			map.put(n, gv);
 		}
-
+		
+		// Add all of the methods to the tree.
 		for(SigmaMethod m : script.mainClass.methods) {
+			// Construct the node, add it to the "Program"
+			// node, and map it to the SigmaGlobalVariable that
+			// it corresponds to.
 			DefaultMutableTreeNode methodNode = updateMethod(m);
 			top.add(methodNode);
 			map.put(methodNode, m);
 		}
 
+		// Reload the model. If we do not relaod it,
+		// the changes would not occur. This is
+		// intentionally done after we do all of the
+		// changes, as if we updated it in any other place,
+		// the model would flicker. This way, the updating is
+		// smooth and the user would not notice anything.
 		model.reload();
-
+		
+		// Expand all of the nodes in the entire tree,
+		// as by default, they are closed, and it is
+		// seriously annoying to have to expand every
+		// single node any time you make a change. The
+		// nodes do not keep their status, as the entire
+		// tree is cleared on every update.
 		expandAllNodes();
 	}
 
+	/**
+	 * Generates a DefaultMutableTreeNode for a
+	 * SigmaMethod.
+	 * @param m The SigmaMethod we are generating the node for.
+	 * @return The DefaultMutableTreeNode that represents m.
+	 */
 	public static DefaultMutableTreeNode updateMethod(SigmaMethod m) {
 		String signature = (m.access == SigmaAccessModifier.NONE) ? ""
 				: (m.access.toString().toLowerCase() + " ") + ((m.isStatic) ? "static " : "") + m.returnType + " "
@@ -578,6 +669,12 @@ public class MainWindow implements TreeSelectionListener {
 		return methodNode;
 	}
 
+	/**
+	 * Generates a DefaultMutableTreeNode for a
+	 * SigmaStatement and adds it to the tree.
+	 * @param s The SigmaStatement that we are generating the node for.
+	 * @param parent The node that the statement's new node should be added under.
+	 */
 	public static void updateStatement(SigmaStatement s, DefaultMutableTreeNode parent) {
 		DefaultMutableTreeNode n = parent;
 		if(s instanceof SigmaAssignment) {
@@ -615,13 +712,20 @@ public class MainWindow implements TreeSelectionListener {
 		}
 	}
 
+	/*
+	 * Simple method to expand all of the nodes in
+	 * the tree.
+	 */
 	private static void expandAllNodes() {
 		int rc = tree.getRowCount();
 		for(int i = 0; i < rc; i++) {
 			tree.expandRow(i);
 		}
-
+		
 		if(tree.getRowCount() != rc) {
+			// Expand all of the nodes again if more were opened.
+			// expandAllNodes() will keep executing recursively
+			// until all of the nodes are expanded.
 			expandAllNodes();
 		}
 	}
