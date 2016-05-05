@@ -28,7 +28,7 @@ public class ShowSourceWindow extends JDialog implements ClipboardOwner {
 	 * Create the dialog.
 	 */
 	public ShowSourceWindow(final String source) {
-		setBounds(100, 100, 450, 300);
+		setBounds(MainWindow.frmSigma.getX(), MainWindow.frmSigma.getY(), 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setLayout(new FlowLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));

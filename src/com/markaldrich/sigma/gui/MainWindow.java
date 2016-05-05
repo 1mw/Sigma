@@ -11,8 +11,11 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -31,6 +34,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -48,12 +52,13 @@ import com.markaldrich.sigma.framework.elements.SigmaObject;
 import com.markaldrich.sigma.framework.elements.SigmaScript;
 import com.markaldrich.sigma.framework.elements.SigmaStatement;
 import com.markaldrich.sigma.framework.elements.SigmaWhileLoop;
+import com.sun.istack.internal.Nullable;
 
 public class MainWindow implements TreeSelectionListener {
 	/**
 	 * The JFrame that is the main window.
 	 */
-	private static JFrame frmSigma;
+	protected static JFrame frmSigma;
 	
 	/**
 	 * The tree that holds the program structure.
@@ -133,6 +138,81 @@ public class MainWindow implements TreeSelectionListener {
 	 */
 	public MainWindow() {
 		initialize();
+	}
+	
+	public static SigmaObject[] analyzeScope(SigmaElement startingElement) {
+		TreeNode start = getNode(startingElement);
+		
+		ArrayList<SigmaObject> variables = new ArrayList<>();
+		
+		// Get path to root
+		List<TreeNode> tmp = Arrays.asList(model.getPathToRoot(start));
+		Collections.reverse(tmp);
+		TreeNode[] pathToRoot = tmp.toArray(new TreeNode[0]);
+		
+		
+		// Holds child node
+		TreeNode child = start;
+		
+		// Iterate through path
+		for (int i = 0; i < pathToRoot.length; i++) {
+			TreeNode parent = pathToRoot[i];
+			
+			// final int childCount = model.getChildCount(parent);
+			final int childIndex = model.getIndexOfChild(parent, child);
+			
+			// Iterate through children of parent up to and including the child
+			// (the given element is above where the new element will be placed) 
+			for (int c = 0; c <= childIndex; c++) {
+				TreeNode currentNode = parent.getChildAt(c);
+				
+				SigmaElement element = map.get(currentNode);
+				
+				if (element instanceof SigmaObject) {
+					SigmaObject object = (SigmaObject) element;
+					
+					variables.add(object);
+				}
+			}
+			
+			child = parent;
+		}
+		
+		System.out.println("analyzeScope");
+		System.out.println(start.toString());
+		System.out.println("Path to root");
+		for (TreeNode e : pathToRoot) {
+			System.out.println(e.toString());
+		}
+		System.out.println("Variables");
+		for (SigmaObject s : variables) {
+			System.out.println(s.declarationToString());
+		}
+		System.out.println();
+		
+		return variables.toArray(new SigmaObject[0]);
+	}
+	
+	public static String[] analyzeScopeForComboBox(SigmaElement startingElement) {
+		SigmaObject[] result = analyzeScope(startingElement);
+		
+		String[] strings = new String[result.length];
+		
+		for (int i = 0; i < result.length; i++) {
+			strings[i] = result[i].name + ": " + result[i].type;
+		}
+		
+		return strings;
+	}
+	
+	public static @Nullable DefaultMutableTreeNode getNode(SigmaElement element) {
+		for (DefaultMutableTreeNode node : map.keySet()) {
+			if (map.get(node) == element) {
+				return node;
+			}
+		}
+		
+		return null;
 	}
 
 	/**
