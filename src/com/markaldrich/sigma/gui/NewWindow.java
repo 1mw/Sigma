@@ -58,7 +58,7 @@ public class NewWindow {
 		frmNewClassLevel
 				.setIconImage(Toolkit.getDefaultToolkit().getImage(NewWindow.class.getResource("/res/logo.png")));
 		frmNewClassLevel.setTitle("New Class Level Item");
-		frmNewClassLevel.setBounds(100, 100, 450, 300);
+		frmNewClassLevel.setBounds(MainWindow.frmSigma.getX(), MainWindow.frmSigma.getY(), 450, 300);
 		frmNewClassLevel.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		frmNewClassLevel.requestFocus();
 		frmNewClassLevel.setResizable(false);

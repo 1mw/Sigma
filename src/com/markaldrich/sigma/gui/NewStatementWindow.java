@@ -33,7 +33,7 @@ public class NewStatementWindow {
 	public SigmaElement ifElseToAddTo;
 	public SigmaMethod ifElseToAddToParent;
 	public int index = -1;
-	private JTextField assignVariable;
+	private JComboBox assignVariable;
 	private JTextField assignValue;
 	private JTextField returnValue;
 	private JTextField variableName;
@@ -85,13 +85,14 @@ public class NewStatementWindow {
 	/**
 	 * Initialize the contents of the frame.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void initialize() {
 		frmNewStatement = new JFrame();
 		frmNewStatement.setIconImage(
 				Toolkit.getDefaultToolkit().getImage(NewStatementWindow.class.getResource("/res/logo.png")));
 		frmNewStatement.setTitle("New Statement");
 		frmNewStatement.setResizable(false);
-		frmNewStatement.setBounds(100, 100, 450, 319);
+		frmNewStatement.setBounds(MainWindow.frmSigma.getX(), MainWindow.frmSigma.getY(), 450, 319);
 		frmNewStatement.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -391,10 +392,10 @@ public class NewStatementWindow {
 		lblValue.setBounds(10, 39, 76, 14);
 		assignmentPanel.add(lblValue);
 
-		assignVariable = new JTextField();
+		assignVariable = new JComboBox(MainWindow.analyzeScopeForComboBox((isMethod) ? methodToAddTo : ifElseToAddTo));
+		assignVariable.setEditable(true);
 		assignVariable.setBounds(96, 11, 138, 20);
 		assignmentPanel.add(assignVariable);
-		assignVariable.setColumns(10);
 
 		assignValue = new JTextField();
 		assignValue.setBounds(96, 36, 138, 20);
@@ -528,7 +529,7 @@ public class NewStatementWindow {
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SigmaAssignment a = new SigmaAssignment();
-				a.object = assignVariable.getText();
+				a.object = assignVariable.getSelectedItem().toString();
 				a.dataToAssign = assignValue.getText();
 
 				if(isMethod) {

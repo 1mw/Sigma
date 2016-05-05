@@ -37,7 +37,7 @@ public class ImportsWindow {
 		frame = new JFrame();
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(ImportsWindow.class.getResource("/res/logo.png")));
 		frame.setResizable(false);
-		frame.setBounds(100, 100, 600, 500);
+		frame.setBounds(MainWindow.frmSigma.getX(), MainWindow.frmSigma.getY(), 600, 500);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
