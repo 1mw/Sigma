@@ -47,6 +47,7 @@ import com.markaldrich.sigma.framework.elements.SigmaMethod;
 import com.markaldrich.sigma.framework.elements.SigmaObject;
 import com.markaldrich.sigma.framework.elements.SigmaScript;
 import com.markaldrich.sigma.framework.elements.SigmaStatement;
+import com.markaldrich.sigma.framework.elements.SigmaWhileLoop;
 
 public class MainWindow implements TreeSelectionListener {
 	/**
@@ -166,14 +167,13 @@ public class MainWindow implements TreeSelectionListener {
 						final SigmaElementType type = (element instanceof SigmaGlobalVariable)
 								? SigmaElementType.GLOBAL_VARIABLE
 								: (element instanceof SigmaScript) ? SigmaElementType.SCRIPT
-										: (element instanceof SigmaMethod) ? SigmaElementType.METHOD
-												: (element instanceof SigmaIfElseStatement) ? SigmaElementType.IF_ELSE
-														: (element instanceof SigmaIfBlock) ? SigmaElementType.IF
-																: (element instanceof SigmaElseBlock)
-																		? SigmaElementType.ELSE
-																		: (element instanceof SigmaStatement)
-																				? SigmaElementType.STATEMENT
-																				: SigmaElementType.UNKNOWN;
+								: (element instanceof SigmaMethod) ? SigmaElementType.METHOD
+								: (element instanceof SigmaIfElseStatement) ? SigmaElementType.IF_ELSE
+								: (element instanceof SigmaIfBlock) ? SigmaElementType.IF
+								: (element instanceof SigmaElseBlock) ? SigmaElementType.ELSE
+								: (element instanceof SigmaWhileLoop) ? SigmaElementType.WHILE_LOOP
+								: (element instanceof SigmaStatement) ? SigmaElementType.STATEMENT
+								: SigmaElementType.UNKNOWN;
 
 						System.out.println();
 						
@@ -195,6 +195,7 @@ public class MainWindow implements TreeSelectionListener {
 							menu.add(addStatement);
 						}
 						a: if(type == SigmaElementType.SCRIPT) {
+							// Exit if the main method already exists
 							for(SigmaMethod m : script.mainClass.methods) {
 								if(m.name.equals("main")) {
 									break a;
@@ -332,6 +333,11 @@ public class MainWindow implements TreeSelectionListener {
 										script.mainClass.methods.get(script.mainClass.methods
 												.indexOf(map.get(selectedItem.getParent()))).statements
 														.remove((SigmaStatement) element);
+										break;
+									case WHILE_LOOP:
+										script.mainClass.methods.get(script.mainClass.methods
+												.indexOf(map.get(selectedItem.getParent()))).statements
+														.remove((SigmaWhileLoop) element);
 										break;
 									default:
 										System.err.println("Couldn't assume type.");
